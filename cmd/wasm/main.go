@@ -38,8 +38,6 @@ type Game struct {
 
 // NewGame creates a new game instance
 func NewGame(canvas js.Value) *Game {
-	log.Println("Creating new game...")
-
 	ctx := canvas.Call("getContext", "2d")
 	if ctx.IsUndefined() || ctx.IsNull() {
 		log.Fatal("Failed to get 2D context from canvas")
@@ -48,17 +46,6 @@ func NewGame(canvas js.Value) *Game {
 
 	width := canvas.Get("width").Int()
 	height := canvas.Get("height").Int()
-
-	log.Printf("Canvas size: %dx%d", width, height)
-	log.Printf("Context: %v", ctx)
-
-	// Test drawing immediately
-	ctx.Set("fillStyle", "#00ff00")
-	ctx.Call("fillRect", 0, 0, 100, 100)
-	log.Println("Drew test rectangle")
-
-	// Force a visual update
-	js.Global().Get("console").Call("log", "Canvas test: green rectangle should be visible")
 
 	// Initialize game components
 	bridge := wasm.NewJSBridge()
@@ -96,13 +83,11 @@ func NewGame(canvas js.Value) *Game {
 		g.cameraY = y
 	})
 
-	log.Println("Game created successfully")
 	return g
 }
 
 // Start begins the game loop
 func (g *Game) Start() {
-	log.Println("Starting game loop...")
 	g.running = true
 	g.gameLoop()
 }
@@ -114,16 +99,6 @@ func (g *Game) Stop() {
 
 // gameLoop runs the main game loop
 func (g *Game) gameLoop() {
-	log.Println("Setting up game loop...")
-
-	// Simple test - just draw immediately
-	g.ctx.Set("fillStyle", "#00ffff")
-	g.ctx.Call("fillRect", 100, 100, 100, 100)
-	g.ctx.Set("fillStyle", "#ffffff")
-	g.ctx.Set("font", "20px monospace")
-	g.ctx.Call("fillText", "WASM Drawing Works!", 150, 150)
-
-	frameCount := 0
 	var renderFrame js.Func
 	renderFrame = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		if !g.running {
@@ -134,16 +109,10 @@ func (g *Game) gameLoop() {
 		currentTime := args[0].Float()
 		if g.lastTime == 0 {
 			g.lastTime = currentTime
-			log.Println("First frame!")
 		}
 
 		deltaTime := currentTime - g.lastTime
 		g.lastTime = currentTime
-
-		frameCount++
-		if frameCount%60 == 0 {
-			log.Printf("Frame %d - calling update and render", frameCount)
-		}
 
 		g.update(deltaTime)
 		g.render()
@@ -152,7 +121,6 @@ func (g *Game) gameLoop() {
 		return nil
 	})
 
-	log.Println("Starting requestAnimationFrame...")
 	js.Global().Call("requestAnimationFrame", renderFrame)
 }
 
@@ -197,43 +165,28 @@ func (g *Game) update(deltaTime float64) {
 
 // render handles drawing the game
 func (g *Game) render() {
-	// Don't clear - just draw on top for debugging
-	// g.ctx.Set("fillStyle", "#000000")
-	// g.ctx.Call("fillRect", 0, 0, g.width, g.height)
-
-	// Always draw a test rectangle to verify we're rendering
-	g.ctx.Set("fillStyle", "#ff00ff")
-	g.ctx.Call("fillRect", 20, 20, 60, 60)
-
-	// Draw frame counter
-	g.ctx.Set("fillStyle", "#00ff00")
-	g.ctx.Set("font", "16px monospace")
-	g.ctx.Set("textAlign", "left")
-	g.ctx.Call("fillText", fmt.Sprintf("Frame: %d", int(g.lastTime/100)), 10, 100)
+	// Clear the canvas
+	g.ctx.Set("fillStyle", "#000000")
+	g.ctx.Call("fillRect", 0, 0, g.width, g.height)
 
 	if g.engine == nil {
 		// Show loading message if not ready
 		g.ctx.Set("fillStyle", "#00ff00")
 		g.ctx.Set("font", "20px monospace")
 		g.ctx.Set("textAlign", "center")
-		g.ctx.Call("fillText", "INITIALIZING...", g.width/2, g.height/2)
+		g.ctx.Call("fillText", "ENGINE NOT INITIALIZED", g.width/2, g.height/2)
 		return
 	}
 
 	// Draw the game directly
 	state := g.engine.GetState()
 
-	// Log every 60 frames (once per second)
-	if int(g.lastTime/1000)%60 == 0 {
-		js.Global().Get("console").Call("log", fmt.Sprintf("Rendering mode: %v, Score: %d", state.Mode, state.Score))
-	}
-
 	// Draw stars background
 	g.ctx.Set("fillStyle", "#ffffff")
-	for i := 0; i < 20; i++ {
+	for i := 0; i < 50; i++ {
 		x := (i * 73) % g.width
 		y := (i * 37) % g.height
-		g.ctx.Call("fillRect", x, y, 1, 1)
+		g.ctx.Call("fillRect", x, y, 2, 2)
 	}
 
 	// Draw game based on mode
@@ -243,6 +196,7 @@ func (g *Game) render() {
 		g.ctx.Set("fillStyle", "#00ff00")
 		g.ctx.Set("font", "48px monospace")
 		g.ctx.Set("textAlign", "center")
+		g.ctx.Set("textBaseline", "middle")
 		g.ctx.Call("fillText", "BOBN", g.width/2, 150)
 
 		g.ctx.Set("font", "20px monospace")
@@ -368,14 +322,11 @@ func (g *Game) updateUI() {
 
 // initializeGame sets up the game and starts it
 func initializeGame() {
-	log.Println("Initializing BOBN WASM game")
-
 	canvas := js.Global().Get("document").Call("getElementById", "gameCanvas")
 	if canvas.IsUndefined() || canvas.IsNull() {
 		log.Fatal("Could not find canvas element with id 'gameCanvas'")
 		return
 	}
-	log.Printf("Found canvas: %v", canvas)
 
 	game := NewGame(canvas)
 

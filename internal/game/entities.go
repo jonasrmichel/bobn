@@ -201,13 +201,13 @@ func NewInvader(invaderType InvaderType, x, y float64, points int) *Invader {
 	switch invaderType {
 	case InvaderTypeSmall:
 		width, height = 16, 16
-		shootChance = 0.1 // 10% chance per second
+		shootChance = 0.03 // 3% chance per second (reduced from 10%)
 	case InvaderTypeMedium:
 		width, height = 20, 16
-		shootChance = 0.05 // 5% chance per second
+		shootChance = 0.02 // 2% chance per second (reduced from 5%)
 	case InvaderTypeLarge:
 		width, height = 24, 16
-		shootChance = 0.02 // 2% chance per second
+		shootChance = 0.01 // 1% chance per second (reduced from 2%)
 	}
 
 	return &Invader{

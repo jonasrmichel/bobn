@@ -229,6 +229,9 @@ func initializeGame() {
 				game.Start()
 				log.Println("Game started")
 			}
+		case "Enter":
+			// Handle Enter key press for game
+			log.Println("Enter pressed")
 		case "Escape":
 			game.Stop()
 			log.Println("Game stopped")
@@ -237,9 +240,13 @@ func initializeGame() {
 		return nil
 	}))
 
-	// Start the game
-	game.Start()
-	log.Println("Game started successfully")
+	// Start the game automatically
+	if game != nil {
+		game.Start()
+		log.Println("Game started successfully")
+	} else {
+		log.Println("Failed to create game instance")
+	}
 }
 
 func main() {

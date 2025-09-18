@@ -116,44 +116,20 @@
             oscilloscope: document.getElementById('oscilloscope')
         };
 
-        // Initialize oscilloscope
+        // Initialize oscilloscope (placeholder - actual display handled by camera controller)
         function initOscilloscope() {
             const ctx = elements.oscilloscope.getContext('2d');
-            ctx.strokeStyle = '#00ff00';
-            ctx.lineWidth = 2;
 
-            // Draw initial grid/waveform
-            setInterval(() => {
-                ctx.clearRect(0, 0, 240, 120);
+            // Initial black background
+            ctx.fillStyle = '#000000';
+            ctx.fillRect(0, 0, 240, 120);
 
-                // Draw grid
-                ctx.strokeStyle = '#003300';
-                ctx.lineWidth = 1;
-                for (let i = 0; i < 240; i += 24) {
-                    ctx.beginPath();
-                    ctx.moveTo(i, 0);
-                    ctx.lineTo(i, 120);
-                    ctx.stroke();
-                }
-                for (let i = 0; i < 120; i += 20) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, i);
-                    ctx.lineTo(240, i);
-                    ctx.stroke();
-                }
-
-                // Draw animated waveform
-                ctx.strokeStyle = '#00ff00';
-                ctx.lineWidth = 2;
-                ctx.beginPath();
-                for (let x = 0; x < 240; x++) {
-                    const y = 60 + Math.sin((x + Date.now() * 0.01) * 0.02) * 20 +
-                             Math.sin((x + Date.now() * 0.005) * 0.05) * 15;
-                    if (x === 0) ctx.moveTo(x, y);
-                    else ctx.lineTo(x, y);
-                }
-                ctx.stroke();
-            }, 50);
+            // Show initial "NO SIGNAL" message
+            ctx.font = '16px monospace';
+            ctx.fillStyle = '#00ff00';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('NO SIGNAL', 120, 60);
         }
 
         // Start button functionality

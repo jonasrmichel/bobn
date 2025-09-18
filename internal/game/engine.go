@@ -81,8 +81,8 @@ func (e *Engine) ProcessAnalogInput(analogX float64, firePressed, fireJustPresse
 				e.state.Player.Position.X = float64(e.state.ScreenWidth) - 30
 			}
 
-			// Handle shooting
-			if firePressed {
+			// Handle shooting - use fireJustPressed for single shots
+			if fireJustPressed {
 				bullet := e.state.Player.TryShoot()
 				if bullet != nil {
 					e.state.Bullets = append(e.state.Bullets, bullet)
@@ -110,7 +110,7 @@ func (e *Engine) ProcessInput(leftPressed, rightPressed, firePressed, fireJustPr
 	// Handle mode-specific input
 	switch e.state.Mode {
 	case AttractMode:
-		if fireJustPressed {
+		if fireJustPressed || pauseJustPressed {
 			e.StartNewGame()
 		}
 	case Playing:

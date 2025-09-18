@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 	"log"
-	"math"
 	"syscall/js"
 	"time"
 
@@ -150,7 +149,7 @@ func (g *Game) update(deltaTime float64) {
 			// Use camera position for analog control
 			g.engine.ProcessAnalogInput(
 				g.cameraX,  // Analog X position (-1 to 1)
-				input.FirePressed || math.Abs(g.cameraY) < 0.2,
+				input.FirePressed,  // Only fire when Space is pressed
 				input.FireJustPressed,
 				input.PauseJustPressed || input.EnterJustPressed,
 			)

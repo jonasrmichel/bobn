@@ -4,7 +4,6 @@ import (
 	"log"
 	"math"
 	"syscall/js"
-	"time"
 )
 
 // CameraController handles camera input for head tracking
@@ -235,50 +234,11 @@ func (c *CameraController) updateOscilloscope(x, y float64) {
 	}
 
 	if c.tracking {
-		// Draw X position wave
-		ctx.Set("strokeStyle", "#00ff00")
-		ctx.Set("lineWidth", 2)
-		ctx.Call("beginPath")
-
-		centerY := height / 4
-		for i := 0.0; i < width; i++ {
-			waveY := centerY + x*20*math.Sin(i*0.1+float64(time.Now().UnixMilli())*0.001)
-			if i == 0 {
-				ctx.Call("moveTo", i, waveY)
-			} else {
-				ctx.Call("lineTo", i, waveY)
-			}
-		}
-		ctx.Call("stroke")
-
-		// Draw Y position wave
-		ctx.Set("strokeStyle", "#00ffff")
-		ctx.Call("beginPath")
-
-		centerY = height * 3 / 4
-		for i := 0.0; i < width; i++ {
-			waveY := centerY + y*20*math.Sin(i*0.1+float64(time.Now().UnixMilli())*0.0015)
-			if i == 0 {
-				ctx.Call("moveTo", i, waveY)
-			} else {
-				ctx.Call("lineTo", i, waveY)
-			}
-		}
-		ctx.Call("stroke")
-
-		// Draw position indicator
+		// Draw position indicator dot only
 		ctx.Set("fillStyle", "#ffff00")
 		ctx.Call("beginPath")
-		ctx.Call("arc", width/2+x*width/4, height/2+y*height/4, 3, 0, math.Pi*2)
+		ctx.Call("arc", width/2+x*width/4, height/2+y*height/4, 5, 0, math.Pi*2)
 		ctx.Call("fill")
-	} else {
-		// Draw flat line when no tracking
-		ctx.Set("strokeStyle", "#00ff00")
-		ctx.Set("lineWidth", 1)
-		ctx.Call("beginPath")
-		ctx.Call("moveTo", 0, height/2)
-		ctx.Call("lineTo", width, height/2)
-		ctx.Call("stroke")
 	}
 }
 

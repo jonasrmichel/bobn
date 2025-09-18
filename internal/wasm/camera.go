@@ -304,7 +304,8 @@ func (c *CameraController) generateASCIIArt() []string {
 
 	for ay := 0; ay < asciiHeight; ay++ {
 		line := ""
-		for ax := 0; ax < asciiWidth; ax++ {
+		// Iterate in reverse order to create horizontal mirror effect
+		for ax := asciiWidth - 1; ax >= 0; ax-- {
 			// Sample a region of pixels
 			x := ax * xStep
 			y := ay * yStep

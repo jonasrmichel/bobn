@@ -38,9 +38,27 @@ type Game struct {
 
 // NewGame creates a new game instance
 func NewGame(canvas js.Value) *Game {
+	log.Println("Creating new game...")
+
 	ctx := canvas.Call("getContext", "2d")
+	if ctx.IsUndefined() || ctx.IsNull() {
+		log.Fatal("Failed to get 2D context from canvas")
+		return nil
+	}
+
 	width := canvas.Get("width").Int()
 	height := canvas.Get("height").Int()
+
+	log.Printf("Canvas size: %dx%d", width, height)
+	log.Printf("Context: %v", ctx)
+
+	// Test drawing immediately
+	ctx.Set("fillStyle", "#00ff00")
+	ctx.Call("fillRect", 0, 0, 100, 100)
+	log.Println("Drew test rectangle")
+
+	// Force a visual update
+	js.Global().Get("console").Call("log", "Canvas test: green rectangle should be visible")
 
 	// Initialize game components
 	bridge := wasm.NewJSBridge()
@@ -78,11 +96,13 @@ func NewGame(canvas js.Value) *Game {
 		g.cameraY = y
 	})
 
+	log.Println("Game created successfully")
 	return g
 }
 
 // Start begins the game loop
 func (g *Game) Start() {
+	log.Println("Starting game loop...")
 	g.running = true
 	g.gameLoop()
 }
@@ -94,6 +114,7 @@ func (g *Game) Stop() {
 
 // gameLoop runs the main game loop
 func (g *Game) gameLoop() {
+	log.Println("Setting up game loop...")
 	var renderFrame js.Func
 	renderFrame = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		if !g.running {
@@ -104,6 +125,7 @@ func (g *Game) gameLoop() {
 		currentTime := args[0].Float()
 		if g.lastTime == 0 {
 			g.lastTime = currentTime
+			log.Println("First frame!")
 		}
 
 		deltaTime := currentTime - g.lastTime
@@ -116,6 +138,7 @@ func (g *Game) gameLoop() {
 		return nil
 	})
 
+	log.Println("Starting requestAnimationFrame...")
 	js.Global().Call("requestAnimationFrame", renderFrame)
 }
 
@@ -160,10 +183,16 @@ func (g *Game) update(deltaTime float64) {
 
 // render handles drawing the game
 func (g *Game) render() {
-	if g.engine == nil || g.renderer == nil {
+	// Clear the canvas
+	g.ctx.Set("fillStyle", "#000000")
+	g.ctx.Call("fillRect", 0, 0, g.width, g.height)
+
+	// Test rectangle to verify drawing works
+	g.ctx.Set("fillStyle", "#ff0000")
+	g.ctx.Call("fillRect", 10, 10, 50, 50)
+
+	if g.engine == nil {
 		// Show loading message if not ready
-		g.ctx.Set("fillStyle", "#000000")
-		g.ctx.Call("fillRect", 0, 0, g.width, g.height)
 		g.ctx.Set("fillStyle", "#00ff00")
 		g.ctx.Set("font", "20px monospace")
 		g.ctx.Set("textAlign", "center")
@@ -171,8 +200,108 @@ func (g *Game) render() {
 		return
 	}
 
-	// Use the renderer to draw the game
-	g.renderer.RenderGame(g.engine.GetState())
+	// Draw the game directly
+	state := g.engine.GetState()
+
+	// Log every 60 frames (once per second)
+	if int(g.lastTime/1000)%60 == 0 {
+		js.Global().Get("console").Call("log", fmt.Sprintf("Rendering mode: %v, Score: %d", state.Mode, state.Score))
+	}
+
+	// Draw stars background
+	g.ctx.Set("fillStyle", "#ffffff")
+	for i := 0; i < 20; i++ {
+		x := (i * 73) % g.width
+		y := (i * 37) % g.height
+		g.ctx.Call("fillRect", x, y, 1, 1)
+	}
+
+	// Draw game based on mode
+	switch state.Mode {
+	case game.AttractMode:
+		// Draw title
+		g.ctx.Set("fillStyle", "#00ff00")
+		g.ctx.Set("font", "48px monospace")
+		g.ctx.Set("textAlign", "center")
+		g.ctx.Call("fillText", "BOBN", g.width/2, 150)
+
+		g.ctx.Set("font", "20px monospace")
+		g.ctx.Set("fillStyle", "#00ffff")
+		g.ctx.Call("fillText", "SPACE INVADERS", g.width/2, 200)
+
+		// Instructions
+		g.ctx.Set("font", "16px monospace")
+		g.ctx.Set("fillStyle", "#ffff00")
+		g.ctx.Call("fillText", "PRESS ENTER TO START", g.width/2, 300)
+		g.ctx.Call("fillText", "USE ARROWS TO MOVE", g.width/2, 330)
+		g.ctx.Call("fillText", "SPACE TO FIRE", g.width/2, 360)
+
+	case game.Playing:
+		// Draw player ship
+		if state.Player != nil && state.Player.Alive {
+			g.ctx.Set("fillStyle", "#00ff00")
+			// Simple triangle ship
+			g.ctx.Call("beginPath")
+			g.ctx.Call("moveTo", state.Player.Position.X, state.Player.Position.Y)
+			g.ctx.Call("lineTo", state.Player.Position.X-15, state.Player.Position.Y+20)
+			g.ctx.Call("lineTo", state.Player.Position.X+15, state.Player.Position.Y+20)
+			g.ctx.Call("closePath")
+			g.ctx.Call("fill")
+		}
+
+		// Draw invaders
+		for _, invader := range state.Invaders {
+			if invader.Alive {
+				g.ctx.Set("fillStyle", "#ff00ff")
+				g.ctx.Call("fillRect", invader.Position.X-10, invader.Position.Y-5, 20, 10)
+				// Eyes
+				g.ctx.Set("fillStyle", "#000000")
+				g.ctx.Call("fillRect", invader.Position.X-6, invader.Position.Y-2, 3, 3)
+				g.ctx.Call("fillRect", invader.Position.X+3, invader.Position.Y-2, 3, 3)
+			}
+		}
+
+		// Draw bullets
+		for _, bullet := range state.Bullets {
+			if bullet.Alive {
+				if bullet.IsPlayerBullet {
+					g.ctx.Set("fillStyle", "#00ff00")
+				} else {
+					g.ctx.Set("fillStyle", "#ff0000")
+				}
+				g.ctx.Call("fillRect", bullet.Position.X-1, bullet.Position.Y, 2, 8)
+			}
+		}
+
+	case game.GameOver:
+		g.ctx.Set("fillStyle", "#ff0000")
+		g.ctx.Set("font", "48px monospace")
+		g.ctx.Set("textAlign", "center")
+		g.ctx.Call("fillText", "GAME OVER", g.width/2, g.height/2)
+
+		g.ctx.Set("font", "20px monospace")
+		g.ctx.Set("fillStyle", "#ffffff")
+		g.ctx.Call("fillText", fmt.Sprintf("SCORE: %d", state.Score), g.width/2, g.height/2+50)
+	}
+
+	// Draw UI (score, lives, etc)
+	g.ctx.Set("fillStyle", "#ffffff")
+	g.ctx.Set("font", "16px monospace")
+	g.ctx.Set("textAlign", "left")
+	g.ctx.Call("fillText", fmt.Sprintf("SCORE: %06d", state.Score), 10, 30)
+
+	g.ctx.Set("textAlign", "center")
+	g.ctx.Call("fillText", fmt.Sprintf("HIGH: %06d", state.HighScore), g.width/2, 30)
+
+	g.ctx.Set("textAlign", "right")
+	g.ctx.Call("fillText", fmt.Sprintf("LIVES: %d", state.Lives), g.width-10, 30)
+
+	// Draw wave number
+	if state.Mode == game.Playing {
+		g.ctx.Set("textAlign", "center")
+		g.ctx.Set("fillStyle", "#00ffff")
+		g.ctx.Call("fillText", fmt.Sprintf("WAVE %d", state.Wave), g.width/2, g.height-20)
+	}
 }
 
 // updateUI updates the HTML UI elements
@@ -222,10 +351,11 @@ func initializeGame() {
 	log.Println("Initializing BOBN WASM game")
 
 	canvas := js.Global().Get("document").Call("getElementById", "gameCanvas")
-	if canvas.IsUndefined() {
+	if canvas.IsUndefined() || canvas.IsNull() {
 		log.Fatal("Could not find canvas element with id 'gameCanvas'")
 		return
 	}
+	log.Printf("Found canvas: %v", canvas)
 
 	game := NewGame(canvas)
 
@@ -266,17 +396,25 @@ func initializeGame() {
 func main() {
 	fmt.Println("BOBN WASM module loaded")
 
+	// Check document state immediately
+	readyState := js.Global().Get("document").Get("readyState").String()
+	fmt.Printf("Document readyState: %s\n", readyState)
+
 	// Wait for the DOM to be ready
 	ready := make(chan struct{})
 
-	js.Global().Get("document").Call("addEventListener", "DOMContentLoaded", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+	if readyState == "complete" || readyState == "interactive" {
+		// DOM is already ready
+		fmt.Println("DOM is already ready, initializing immediately")
 		close(ready)
-		return nil
-	}))
-
-	// If DOM is already loaded, start immediately
-	if js.Global().Get("document").Get("readyState").String() == "complete" {
-		close(ready)
+	} else {
+		// Wait for DOM to be ready
+		fmt.Println("Waiting for DOM to be ready...")
+		js.Global().Get("document").Call("addEventListener", "DOMContentLoaded", js.FuncOf(func(this js.Value, args []js.Value) interface{} {
+			fmt.Println("DOMContentLoaded event fired")
+			close(ready)
+			return nil
+		}))
 	}
 
 	// Wait for DOM ready or timeout
@@ -285,6 +423,8 @@ func main() {
 
 	select {
 	case <-ready:
+		// Add a small delay to ensure canvas is fully rendered
+		time.Sleep(100 * time.Millisecond)
 		initializeGame()
 	case <-ctx.Done():
 		log.Fatal("Timeout waiting for DOM to be ready")

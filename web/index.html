@@ -8,87 +8,93 @@
 </head>
 <body>
     <div class="arcade-cabinet">
-        <!-- Arcade Cabinet Header -->
-        <div class="cabinet-header">
-            <div class="neon-title">
-                <h1 class="game-title">BOBN</h1>
-                <div class="subtitle">CAMERA CONTROL ARCADE</div>
-            </div>
-        </div>
-
-        <!-- Main Game Screen Area -->
-        <div class="screen-bezel">
-            <div class="crt-container">
-                <canvas id="gameCanvas" width="640" height="400" class="game-screen"></canvas>
-                <div class="crt-overlay"></div>
-                <div class="scanlines"></div>
-                <div class="screen-glow"></div>
-            </div>
-        </div>
-
-        <!-- Oscilloscope for Camera Visualization -->
-        <div class="oscilloscope-section">
-            <div class="oscilloscope-label">CAMERA TRACKER</div>
-            <div class="oscilloscope-bezel">
-                <canvas id="oscilloscope" width="240" height="120" class="oscilloscope-screen"></canvas>
-                <div class="oscilloscope-overlay"></div>
-                <div class="oscilloscope-grid"></div>
-            </div>
-        </div>
-
-        <!-- Game Stats Display -->
-        <div class="stats-panel">
-            <div class="stat-display">
-                <div class="stat-label">SCORE</div>
-                <div id="score" class="stat-value">000000</div>
-            </div>
-            <div class="stat-display">
-                <div class="stat-label">HIGH SCORE</div>
-                <div id="highScore" class="stat-value">000000</div>
-            </div>
-            <div class="stat-display">
-                <div class="stat-label">LIVES</div>
-                <div id="lives" class="stat-value">3</div>
-            </div>
-            <div class="stat-display">
-                <div class="stat-label">LEVEL</div>
-                <div id="level" class="stat-value">1</div>
-            </div>
-        </div>
-
-        <!-- Control Panel -->
-        <div class="control-panel">
-            <div class="coin-slot-section">
-                <button id="insertCoinBtn" class="arcade-button coin-button">
-                    <div class="button-top"></div>
-                    <span>INSERT COIN</span>
-                </button>
-                <div id="creditDisplay" class="credit-display">CREDITS: 0</div>
+        <!-- Main Game Area -->
+        <div class="main-game-area">
+            <!-- Cabinet Header with Title -->
+            <div class="cabinet-header">
+                <div class="neon-title">
+                    <h1 class="game-title">BOBN</h1>
+                    <p class="subtitle">SPACE DEFENDER</p>
+                </div>
             </div>
 
-            <div class="game-controls">
-                <button id="startBtn" class="arcade-button start-button">
-                    <div class="button-top"></div>
-                    <span>START</span>
-                </button>
+            <!-- Main Game Screen Area -->
+            <div class="screen-bezel">
+                <div class="crt-container">
+                    <canvas id="gameCanvas" width="800" height="500" class="game-screen"></canvas>
+                    <div class="crt-overlay"></div>
+                    <div class="scanlines"></div>
+                    <div class="screen-glow"></div>
+                </div>
+            </div>
 
-                <div class="instruction-panel">
-                    <div class="instructions-title">CONTROLS</div>
-                    <div class="control-item">SPACEBAR - FIRE / PAUSE</div>
-                    <div class="control-item">ESC - STOP GAME</div>
-                    <div class="control-item">MOVE CAMERA - CONTROL SHIP</div>
+            <!-- Status Messages -->
+            <div class="status-section">
+                <div id="loadingMessage" class="status-message loading">
+                    INITIALIZING SYSTEM...
+                </div>
+                <div id="errorMessage" class="status-message error" style="display: none;"></div>
+                <div id="gameMessage" class="status-message game-status" style="display: none;">
+                    PRESS START TO PLAY
                 </div>
             </div>
         </div>
 
-        <!-- Status Messages -->
-        <div class="status-section">
-            <div id="loadingMessage" class="status-message loading">
-                INITIALIZING SYSTEM...
+        <!-- Side Panel -->
+        <div class="side-panel">
+            <!-- Stats Panel -->
+            <div class="stats-panel">
+                <div class="stat-display">
+                    <div class="stat-label">SCORE</div>
+                    <div id="score" class="stat-value">000000</div>
+                </div>
+                <div class="stat-display">
+                    <div class="stat-label">HIGH</div>
+                    <div id="highScore" class="stat-value">000000</div>
+                </div>
+                <div class="stat-display">
+                    <div class="stat-label">LIVES</div>
+                    <div id="lives" class="stat-value">3</div>
+                </div>
+                <div class="stat-display">
+                    <div class="stat-label">LEVEL</div>
+                    <div id="level" class="stat-value">1</div>
+                </div>
             </div>
-            <div id="errorMessage" class="status-message error" style="display: none;"></div>
-            <div id="gameMessage" class="status-message game-status" style="display: none;">
-                PRESS START TO PLAY
+
+            <!-- Oscilloscope -->
+            <div class="oscilloscope-section">
+                <div class="oscilloscope-label">HEAD TRACKING</div>
+                <div class="oscilloscope-bezel">
+                    <canvas id="oscilloscope" width="240" height="120" class="oscilloscope-screen"></canvas>
+                    <div class="oscilloscope-overlay"></div>
+                </div>
+            </div>
+
+            <!-- Control Panel -->
+            <div class="control-panel">
+                <div class="coin-slot-section">
+                    <div class="button-group">
+                        <button id="insertCoinBtn" class="arcade-button coin-button">
+                            <div class="button-top"></div>
+                            <span>INSERT<br/>COIN</span>
+                        </button>
+                        <button id="startBtn" class="arcade-button start-button">
+                            <div class="button-top"></div>
+                            <span>START</span>
+                        </button>
+                    </div>
+                    <div id="creditDisplay" class="credit-display">CREDITS: 0</div>
+                </div>
+
+                <div class="instruction-panel">
+                    <div class="instructions-title">CONTROLS</div>
+                    <div class="control-item">SPACEBAR - FIRE</div>
+                    <div class="control-item">ARROWS - MOVE</div>
+                    <div class="control-item">ENTER - START</div>
+                    <div class="control-item">ESC - PAUSE</div>
+                    <div class="control-item">CAMERA - HEAD CONTROL</div>
+                </div>
             </div>
         </div>
 
@@ -217,45 +223,57 @@
                 go.run(result.instance);
 
                 // Game initialization complete
-                setTimeout(() => {
-                    elements.loadingMessage.style.display = 'none';
-                    elements.gameMessage.style.display = 'block';
-                    elements.gameMessage.textContent = 'INSERT COIN TO PLAY';
-                    gameInitialized = true;
-                    initOscilloscope();
-                }, 1000);
+                gameInitialized = true;
+                elements.loadingMessage.style.display = 'none';
+                elements.gameMessage.style.display = 'block';
+                elements.gameMessage.textContent = 'INSERT COIN TO PLAY';
 
-            } catch (error) {
-                console.error('Failed to load WASM:', error);
+            } catch (err) {
+                console.error('Failed to load WASM:', err);
                 elements.loadingMessage.style.display = 'none';
                 elements.errorMessage.style.display = 'block';
-                elements.errorMessage.textContent = `SYSTEM ERROR: ${error.message}`;
+                elements.errorMessage.textContent = 'SYSTEM ERROR: ' + err.message;
             }
         }
 
-        // Load WASM when page is ready
-        if (document.readyState === 'loading') {
-            document.addEventListener('DOMContentLoaded', loadWasm);
+        // Test canvas drawing directly
+        function testCanvas() {
+            const canvas = document.getElementById('gameCanvas');
+            const ctx = canvas.getContext('2d');
+
+            // Draw a test pattern
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(50, 50, 100, 100);
+
+            ctx.fillStyle = '#00ff00';
+            ctx.fillRect(200, 50, 100, 100);
+
+            ctx.fillStyle = '#0000ff';
+            ctx.fillRect(350, 50, 100, 100);
+
+            ctx.fillStyle = '#ffffff';
+            ctx.font = '30px Arial';
+            ctx.fillText('Canvas Test', 250, 250);
+
+            console.log('Drew test pattern on canvas');
+        }
+
+        // Initialize when ready
+        if (document.readyState === 'complete' || document.readyState === 'interactive') {
+            initOscilloscope();
+            testCanvas();  // Test the canvas first
+            setTimeout(() => {
+                loadWasm();  // Then load WASM after a delay
+            }, 1000);
         } else {
-            loadWasm();
+            document.addEventListener('DOMContentLoaded', () => {
+                initOscilloscope();
+                testCanvas();  // Test the canvas first
+                setTimeout(() => {
+                    loadWasm();  // Then load WASM after a delay
+                }, 1000);
+            });
         }
-
-        // Enhanced keyboard handling
-        document.addEventListener('keydown', function(event) {
-            // Prevent default behavior for game controls
-            if (event.key === ' ' || event.key === 'Escape') {
-                event.preventDefault();
-            }
-
-            // Cheat code for free credits (Konami code inspired)
-            if (event.key === 'c' && event.ctrlKey) {
-                credits += 5;
-                updateCredits();
-            }
-        });
-
-        // Initialize displays
-        updateCredits();
     </script>
 </body>
 </html>

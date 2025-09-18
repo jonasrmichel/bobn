@@ -57,7 +57,7 @@ body::before {
 
 /* Main Arcade Cabinet */
 .arcade-cabinet {
-    max-width: 1200px;
+    max-width: 1400px;
     margin: 0 auto;
     padding: 10px;
     background: linear-gradient(180deg, var(--cabinet-dark) 0%, var(--cabinet-medium) 100%);
@@ -70,7 +70,29 @@ body::before {
     overflow: hidden;
     height: 100vh;
     display: flex;
+    flex-direction: row;
+    gap: 15px;
+}
+
+/* Main game area container */
+.main-game-area {
+    flex: 1;
+    display: flex;
     flex-direction: column;
+    min-width: 0;
+}
+
+/* Side panel container */
+.side-panel {
+    width: 260px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.5) 100%);
+    padding: 10px;
+    border-radius: 10px;
+    border: 1px solid rgba(0, 255, 0, 0.3);
+    flex-shrink: 0;
 }
 
 /* Cabinet Header with Neon Title */
@@ -134,7 +156,7 @@ body::before {
 /* Main Screen Area */
 .screen-bezel {
     background: linear-gradient(145deg, #333, #111);
-    padding: 10px;
+    padding: 15px;
     border-radius: 10px;
     margin: 10px 0;
     box-shadow:
@@ -154,16 +176,16 @@ body::before {
     border-radius: 10px;
     overflow: hidden;
     box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9);
-    width: 640px;
-    height: 400px;
+    width: 800px;
+    height: 500px;
     max-width: 100%;
     max-height: 100%;
 }
 
 .game-screen {
     display: block;
-    width: 640px;
-    height: 400px;
+    width: 800px;
+    height: 500px;
     max-width: 100%;
     max-height: 100%;
     background: var(--screen-black);
@@ -275,10 +297,10 @@ body::before {
 /* Stats Panel */
 .stats-panel {
     display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 10px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
     margin: 10px 0;
-    padding: 15px;
+    padding: 10px;
     background: linear-gradient(135deg, rgba(0, 255, 0, 0.1) 0%, rgba(0, 255, 255, 0.1) 100%);
     border: 1px solid var(--neon-cyan);
     border-radius: 8px;
@@ -288,7 +310,7 @@ body::before {
 
 .stat-display {
     text-align: center;
-    padding: 8px;
+    padding: 6px;
     background: rgba(0, 0, 0, 0.5);
     border: 1px solid var(--neon-green);
     border-radius: 4px;
@@ -296,16 +318,16 @@ body::before {
 }
 
 .stat-label {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     color: var(--neon-amber);
     font-weight: 700;
     letter-spacing: 0.05em;
-    margin-bottom: 3px;
+    margin-bottom: 2px;
     text-shadow: 0 0 3px var(--neon-amber);
 }
 
 .stat-value {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     color: var(--neon-green);
     font-weight: 900;
     text-shadow: 0 0 8px var(--neon-green);
@@ -314,14 +336,13 @@ body::before {
 
 /* Control Panel */
 .control-panel {
-    display: grid;
-    grid-template-columns: 1fr 2fr;
+    display: flex;
+    flex-direction: column;
     gap: 15px;
     padding: 15px;
     background: linear-gradient(180deg, var(--cabinet-medium) 0%, var(--cabinet-dark) 100%);
     border: 1px solid var(--neon-magenta);
     border-radius: 10px;
-    margin: 10px 0;
     box-shadow:
         0 0 15px rgba(255, 0, 255, 0.3),
         inset 0 0 20px rgba(0, 0, 0, 0.3);
@@ -330,6 +351,16 @@ body::before {
 
 .coin-slot-section {
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+}
+
+.button-group {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
 }
 
 .credit-display {

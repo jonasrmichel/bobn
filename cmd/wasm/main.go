@@ -53,6 +53,9 @@ func NewGame(canvas js.Value) *Game {
 	engine := game.NewEngine(width, height)
 	renderer := wasm.NewRenderer(bridge, width, height)
 
+	// Set the renderer to use the same context
+	renderer.SetContext(ctx)
+
 	// Initialize camera controller
 	camera := wasm.NewCameraController()
 	camera.Initialize()
@@ -157,8 +160,20 @@ func (g *Game) update(deltaTime float64) {
 
 // render handles drawing the game
 func (g *Game) render() {
-	// Render the game using the renderer
-	g.renderer.RenderGame(g.engine.GetState())
+	// Clear the canvas
+	g.ctx.Set("fillStyle", "#000000")
+	g.ctx.Call("fillRect", 0, 0, g.width, g.height)
+
+	// Draw test text to verify canvas is working
+	g.ctx.Set("fillStyle", "#00ff00")
+	g.ctx.Set("font", "20px monospace")
+	g.ctx.Set("textAlign", "center")
+	g.ctx.Call("fillText", "BOBN GAME LOADING...", g.width/2, g.height/2)
+
+	// Try to render the actual game
+	if g.renderer != nil && g.engine != nil {
+		g.renderer.RenderGame(g.engine.GetState())
+	}
 }
 
 // updateUI updates the HTML UI elements

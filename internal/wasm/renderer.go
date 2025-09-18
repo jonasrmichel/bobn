@@ -28,6 +28,11 @@ func NewRenderer(bridge *JSBridge, screenWidth, screenHeight int) *Renderer {
 	}
 }
 
+// SetContext sets the rendering context
+func (r *Renderer) SetContext(ctx js.Value) {
+	r.ctx = ctx
+}
+
 // Clear clears the canvas
 func (r *Renderer) Clear() {
 	r.ctx.Call("clearRect", 0, 0, r.screenWidth, r.screenHeight)

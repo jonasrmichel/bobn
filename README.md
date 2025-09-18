@@ -304,7 +304,7 @@ invaderDropDistance: 20.0  // Pixels per drop
 ```
     ┌────────────────────────────┐
     │   Apache License 2.0       │
-    │   Copyright 2024           │
+    │   Copyright 2025           │
     │   Jonas Michel             │
     └────────────────────────────┘
 ```

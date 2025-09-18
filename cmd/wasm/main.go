@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"math"
 	"syscall/js"
 	"time"
 
@@ -24,10 +25,15 @@ type Game struct {
 	bridge    *wasm.JSBridge
 	renderer  *wasm.Renderer
 	engine    *game.Engine
+	camera    *wasm.CameraController
 
 	// Timing
 	accumulator float64
 	frameTime   float64
+
+	// Camera input
+	cameraX   float64
+	cameraY   float64
 }
 
 // NewGame creates a new game instance
@@ -38,12 +44,20 @@ func NewGame(canvas js.Value) *Game {
 
 	// Initialize game components
 	bridge := wasm.NewJSBridge()
-	bridge.Initialize("gameCanvas")
+	err := bridge.Initialize("gameCanvas")
+	if err != nil {
+		log.Printf("Failed to initialize bridge: %v", err)
+		return nil
+	}
 
 	engine := game.NewEngine(width, height)
 	renderer := wasm.NewRenderer(bridge, width, height)
 
-	return &Game{
+	// Initialize camera controller
+	camera := wasm.NewCameraController()
+	camera.Initialize()
+
+	g := &Game{
 		canvas:      canvas,
 		ctx:         ctx,
 		width:       width,
@@ -51,8 +65,17 @@ func NewGame(canvas js.Value) *Game {
 		bridge:      bridge,
 		engine:      engine,
 		renderer:    renderer,
+		camera:      camera,
 		frameTime:   1000.0 / 60.0, // 60 FPS target
 	}
+
+	// Set up camera position callback
+	camera.SetPositionCallback(func(x, y float64) {
+		g.cameraX = x
+		g.cameraY = y
+	})
+
+	return g
 }
 
 // Start begins the game loop
@@ -104,11 +127,22 @@ func (g *Game) update(deltaTime float64) {
 		// Get input state from bridge
 		input := g.bridge.GetInputState()
 
+		// Merge camera input with keyboard input
+		leftPressed := input.LeftPressed || (g.camera.IsEnabled() && g.cameraX < -0.3)
+		rightPressed := input.RightPressed || (g.camera.IsEnabled() && g.cameraX > 0.3)
+
+		// Auto-fire when camera is enabled and player is moving
+		firePressed := input.FirePressed
+		if g.camera.IsEnabled() && math.Abs(g.cameraY) < 0.3 {
+			// Fire when head is centered vertically
+			firePressed = true
+		}
+
 		// Process input and update game state
 		g.engine.ProcessInput(
-			input.LeftPressed,
-			input.RightPressed,
-			input.FirePressed,
+			leftPressed,
+			rightPressed,
+			firePressed,
 			input.FireJustPressed,
 			input.PauseJustPressed || input.EnterJustPressed,
 		)

@@ -28,8 +28,8 @@ body {
     background: linear-gradient(135deg, var(--dark-bg) 0%, #1a0a1a 50%, var(--dark-bg) 100%);
     color: var(--neon-green);
     font-family: 'Orbitron', 'Courier New', monospace;
-    overflow-x: hidden;
-    min-height: 100vh;
+    overflow: hidden;
+    height: 100vh;
     position: relative;
 }
 
@@ -59,22 +59,26 @@ body::before {
 .arcade-cabinet {
     max-width: 1200px;
     margin: 0 auto;
-    padding: 20px;
+    padding: 10px;
     background: linear-gradient(180deg, var(--cabinet-dark) 0%, var(--cabinet-medium) 100%);
-    border: 3px solid var(--neon-green);
-    border-radius: 20px 20px 0 0;
+    border: 2px solid var(--neon-green);
+    border-radius: 15px 15px 0 0;
     box-shadow:
-        0 0 30px var(--neon-green),
-        inset 0 0 50px rgba(0, 255, 0, 0.1);
+        0 0 20px var(--neon-green),
+        inset 0 0 30px rgba(0, 255, 0, 0.1);
     position: relative;
     overflow: hidden;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
 }
 
 /* Cabinet Header with Neon Title */
 .cabinet-header {
     text-align: center;
-    padding: 20px 0 30px;
+    padding: 10px 0 15px;
     background: radial-gradient(ellipse at center, rgba(0, 255, 0, 0.2) 0%, transparent 70%);
+    flex-shrink: 0;
 }
 
 .neon-title {
@@ -82,7 +86,7 @@ body::before {
 }
 
 .game-title {
-    font-size: 4rem;
+    font-size: 2.5rem;
     font-weight: 900;
     margin: 0;
     color: var(--neon-green);
@@ -92,16 +96,16 @@ body::before {
         0 0 40px var(--neon-green),
         0 0 80px var(--neon-green);
     animation: neonFlicker 2s infinite alternate;
-    letter-spacing: 0.3em;
+    letter-spacing: 0.2em;
     text-transform: uppercase;
 }
 
 .subtitle {
-    font-size: 1rem;
+    font-size: 0.8rem;
     color: var(--neon-cyan);
     text-shadow: 0 0 10px var(--neon-cyan);
-    letter-spacing: 0.2em;
-    margin-top: 10px;
+    letter-spacing: 0.1em;
+    margin-top: 5px;
     animation: subtitleGlow 3s ease-in-out infinite alternate;
 }
 
@@ -130,13 +134,15 @@ body::before {
 /* Main Screen Area */
 .screen-bezel {
     background: linear-gradient(145deg, #333, #111);
-    padding: 20px;
-    border-radius: 15px;
-    margin: 20px 0;
+    padding: 10px;
+    border-radius: 10px;
+    margin: 10px 0;
     box-shadow:
-        inset 0 0 20px rgba(0, 0, 0, 0.8),
-        0 0 20px rgba(0, 255, 0, 0.3);
+        inset 0 0 15px rgba(0, 0, 0, 0.8),
+        0 0 15px rgba(0, 255, 0, 0.3);
     position: relative;
+    flex: 1;
+    min-height: 0;
 }
 
 .crt-container {
@@ -214,27 +220,28 @@ body::before {
 
 /* Oscilloscope Section */
 .oscilloscope-section {
-    margin: 20px 0;
+    margin: 10px 0;
     text-align: center;
+    flex-shrink: 0;
 }
 
 .oscilloscope-label {
     color: var(--neon-amber);
-    font-size: 0.9rem;
+    font-size: 0.75rem;
     font-weight: 700;
-    letter-spacing: 0.1em;
-    text-shadow: 0 0 5px var(--neon-amber);
-    margin-bottom: 10px;
+    letter-spacing: 0.05em;
+    text-shadow: 0 0 4px var(--neon-amber);
+    margin-bottom: 6px;
 }
 
 .oscilloscope-bezel {
     display: inline-block;
     background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
-    padding: 15px;
-    border-radius: 10px;
+    padding: 8px;
+    border-radius: 8px;
     box-shadow:
-        inset 0 0 15px rgba(0, 0, 0, 0.8),
-        0 0 15px rgba(255, 191, 0, 0.3);
+        inset 0 0 10px rgba(0, 0, 0, 0.8),
+        0 0 10px rgba(255, 191, 0, 0.3);
     position: relative;
 }
 
@@ -247,51 +254,52 @@ body::before {
 
 .oscilloscope-overlay {
     position: absolute;
-    top: 15px;
-    left: 15px;
-    right: 15px;
-    bottom: 15px;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
     background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
-    border-radius: 5px;
+    border-radius: 4px;
     pointer-events: none;
 }
 
 /* Stats Panel */
 .stats-panel {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-    gap: 20px;
-    margin: 20px 0;
-    padding: 20px;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 10px;
+    margin: 10px 0;
+    padding: 15px;
     background: linear-gradient(135deg, rgba(0, 255, 0, 0.1) 0%, rgba(0, 255, 255, 0.1) 100%);
-    border: 2px solid var(--neon-cyan);
-    border-radius: 10px;
-    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    flex-shrink: 0;
 }
 
 .stat-display {
     text-align: center;
-    padding: 15px;
+    padding: 8px;
     background: rgba(0, 0, 0, 0.5);
     border: 1px solid var(--neon-green);
-    border-radius: 5px;
-    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+    border-radius: 4px;
+    box-shadow: inset 0 0 8px rgba(0, 0, 0, 0.5);
 }
 
 .stat-label {
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: var(--neon-amber);
     font-weight: 700;
-    letter-spacing: 0.1em;
-    margin-bottom: 5px;
+    letter-spacing: 0.05em;
+    margin-bottom: 3px;
     text-shadow: 0 0 3px var(--neon-amber);
 }
 
 .stat-value {
-    font-size: 1.5rem;
+    font-size: 1.1rem;
     color: var(--neon-green);
     font-weight: 900;
-    text-shadow: 0 0 10px var(--neon-green);
+    text-shadow: 0 0 8px var(--neon-green);
     font-family: 'Orbitron', monospace;
 }
 
@@ -299,15 +307,16 @@ body::before {
 .control-panel {
     display: grid;
     grid-template-columns: 1fr 2fr;
-    gap: 30px;
-    padding: 30px;
+    gap: 15px;
+    padding: 15px;
     background: linear-gradient(180deg, var(--cabinet-medium) 0%, var(--cabinet-dark) 100%);
-    border: 2px solid var(--neon-magenta);
-    border-radius: 15px;
-    margin: 20px 0;
+    border: 1px solid var(--neon-magenta);
+    border-radius: 10px;
+    margin: 10px 0;
     box-shadow:
-        0 0 20px rgba(255, 0, 255, 0.3),
-        inset 0 0 30px rgba(0, 0, 0, 0.3);
+        0 0 15px rgba(255, 0, 255, 0.3),
+        inset 0 0 20px rgba(0, 0, 0, 0.3);
+    flex-shrink: 0;
 }
 
 .coin-slot-section {
@@ -317,9 +326,9 @@ body::before {
 .credit-display {
     color: var(--neon-amber);
     font-weight: 700;
-    text-shadow: 0 0 5px var(--neon-amber);
-    margin-top: 15px;
-    font-size: 1.1rem;
+    text-shadow: 0 0 4px var(--neon-amber);
+    margin-top: 8px;
+    font-size: 0.9rem;
 }
 
 /* Arcade Buttons */
@@ -328,18 +337,18 @@ body::before {
     background: linear-gradient(145deg, #ff4444, #cc0000);
     border: none;
     border-radius: 50%;
-    width: 80px;
-    height: 80px;
+    width: 60px;
+    height: 60px;
     cursor: pointer;
     font-family: 'Orbitron', monospace;
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 0.7rem;
     color: white;
-    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+    text-shadow: 0 0 4px rgba(255, 255, 255, 0.8);
     box-shadow:
-        0 8px 0 #990000,
-        0 12px 20px rgba(0, 0, 0, 0.5),
-        inset 0 0 20px rgba(255, 255, 255, 0.2);
+        0 6px 0 #990000,
+        0 9px 15px rgba(0, 0, 0, 0.5),
+        inset 0 0 15px rgba(255, 255, 255, 0.2);
     transition: all 0.1s;
     overflow: hidden;
 }
@@ -395,27 +404,27 @@ body::before {
 
 /* Instruction Panel */
 .instruction-panel {
-    padding: 20px;
+    padding: 10px;
     background: rgba(0, 0, 0, 0.7);
     border: 1px solid var(--neon-cyan);
-    border-radius: 10px;
-    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+    border-radius: 6px;
+    box-shadow: 0 0 8px rgba(0, 255, 255, 0.3);
 }
 
 .instructions-title {
     color: var(--neon-cyan);
     font-weight: 700;
-    font-size: 1.1rem;
-    text-shadow: 0 0 5px var(--neon-cyan);
-    margin-bottom: 15px;
+    font-size: 0.9rem;
+    text-shadow: 0 0 4px var(--neon-cyan);
+    margin-bottom: 8px;
     text-align: center;
 }
 
 .control-item {
     color: var(--neon-green);
-    font-size: 0.9rem;
-    margin: 8px 0;
-    padding-left: 10px;
+    font-size: 0.75rem;
+    margin: 4px 0;
+    padding-left: 8px;
     border-left: 2px solid var(--neon-green);
     text-shadow: 0 0 3px var(--neon-green);
 }
@@ -423,15 +432,16 @@ body::before {
 /* Status Messages */
 .status-section {
     text-align: center;
-    margin: 20px 0;
-    min-height: 60px;
+    margin: 10px 0;
+    min-height: 40px;
+    flex-shrink: 0;
 }
 
 .status-message {
-    padding: 15px;
-    border-radius: 10px;
+    padding: 10px;
+    border-radius: 8px;
     font-weight: 700;
-    font-size: 1.1rem;
+    font-size: 0.9rem;
     letter-spacing: 0.1em;
     animation: statusPulse 2s ease-in-out infinite alternate;
 }
@@ -510,51 +520,119 @@ body::before {
 /* Responsive Design */
 @media (max-width: 1024px) {
     .arcade-cabinet {
-        margin: 10px;
-        padding: 15px;
+        margin: 5px;
+        padding: 8px;
     }
 
     .game-title {
-        font-size: 3rem;
+        font-size: 2rem;
     }
 
     .control-panel {
         grid-template-columns: 1fr;
-        gap: 20px;
+        gap: 10px;
+        padding: 10px;
     }
 }
 
 @media (max-width: 768px) {
     .game-title {
-        font-size: 2.5rem;
+        font-size: 1.8rem;
     }
 
     .stats-panel {
         grid-template-columns: repeat(2, 1fr);
+        gap: 8px;
+        padding: 10px;
     }
 
     .arcade-button {
-        width: 60px;
-        height: 60px;
-        font-size: 0.7rem;
+        width: 50px;
+        height: 50px;
+        font-size: 0.6rem;
+    }
+
+    .screen-bezel {
+        padding: 8px;
+        margin: 8px 0;
     }
 }
 
 @media (max-width: 480px) {
     .game-title {
-        font-size: 2rem;
+        font-size: 1.5rem;
     }
 
     .stats-panel {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 5px;
+        padding: 8px;
     }
 
     .screen-bezel {
-        padding: 10px;
+        padding: 6px;
+        margin: 6px 0;
     }
 
     .control-panel {
-        padding: 15px;
+        padding: 10px;
+        gap: 10px;
+    }
+
+    .arcade-button {
+        width: 45px;
+        height: 45px;
+        font-size: 0.55rem;
+    }
+}
+
+/* Extra compact for very small screens or landscape mobile */
+@media (max-height: 700px) {
+    .arcade-cabinet {
+        padding: 5px;
+    }
+
+    .cabinet-header {
+        padding: 5px 0 8px;
+    }
+
+    .game-title {
+        font-size: 1.8rem;
+    }
+
+    .subtitle {
+        font-size: 0.7rem;
+        margin-top: 3px;
+    }
+
+    .screen-bezel {
+        padding: 6px;
+        margin: 6px 0;
+    }
+
+    .stats-panel {
+        padding: 8px;
+        gap: 6px;
+        margin: 6px 0;
+    }
+
+    .stat-display {
+        padding: 6px;
+    }
+
+    .control-panel {
+        padding: 8px;
+        gap: 10px;
+        margin: 6px 0;
+    }
+
+    .status-section {
+        margin: 6px 0;
+        min-height: 30px;
+    }
+
+    .oscilloscope-section {
+        margin: 6px 0;
     }
 }
 

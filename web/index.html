@@ -19,7 +19,7 @@
         <!-- Main Game Screen Area -->
         <div class="screen-bezel">
             <div class="crt-container">
-                <canvas id="gameCanvas" width="800" height="600" class="game-screen"></canvas>
+                <canvas id="gameCanvas" width="640" height="400" class="game-screen"></canvas>
                 <div class="crt-overlay"></div>
                 <div class="scanlines"></div>
                 <div class="screen-glow"></div>
@@ -30,7 +30,7 @@
         <div class="oscilloscope-section">
             <div class="oscilloscope-label">CAMERA TRACKER</div>
             <div class="oscilloscope-bezel">
-                <canvas id="oscilloscope" width="300" height="200" class="oscilloscope-screen"></canvas>
+                <canvas id="oscilloscope" width="240" height="120" class="oscilloscope-screen"></canvas>
                 <div class="oscilloscope-overlay"></div>
                 <div class="oscilloscope-grid"></div>
             </div>
@@ -40,19 +40,19 @@
         <div class="stats-panel">
             <div class="stat-display">
                 <div class="stat-label">SCORE</div>
-                <div id="scoreDisplay" class="stat-value">000000</div>
+                <div id="score" class="stat-value">000000</div>
             </div>
             <div class="stat-display">
                 <div class="stat-label">HIGH SCORE</div>
-                <div id="highScoreDisplay" class="stat-value">000000</div>
+                <div id="highScore" class="stat-value">000000</div>
             </div>
             <div class="stat-display">
                 <div class="stat-label">LIVES</div>
-                <div id="livesDisplay" class="stat-value">3</div>
+                <div id="lives" class="stat-value">3</div>
             </div>
             <div class="stat-display">
                 <div class="stat-label">LEVEL</div>
-                <div id="levelDisplay" class="stat-value">1</div>
+                <div id="level" class="stat-value">1</div>
             </div>
         </div>
 
@@ -111,10 +111,10 @@
             errorMessage: document.getElementById('errorMessage'),
             gameMessage: document.getElementById('gameMessage'),
             creditDisplay: document.getElementById('creditDisplay'),
-            scoreDisplay: document.getElementById('scoreDisplay'),
-            highScoreDisplay: document.getElementById('highScoreDisplay'),
-            livesDisplay: document.getElementById('livesDisplay'),
-            levelDisplay: document.getElementById('levelDisplay'),
+            scoreDisplay: document.getElementById('score'),
+            highScoreDisplay: document.getElementById('highScore'),
+            livesDisplay: document.getElementById('lives'),
+            levelDisplay: document.getElementById('level'),
             insertCoinBtn: document.getElementById('insertCoinBtn'),
             startBtn: document.getElementById('startBtn'),
             oscilloscope: document.getElementById('oscilloscope')
@@ -128,21 +128,21 @@
 
             // Draw initial grid/waveform
             setInterval(() => {
-                ctx.clearRect(0, 0, 300, 200);
+                ctx.clearRect(0, 0, 240, 120);
 
                 // Draw grid
                 ctx.strokeStyle = '#003300';
                 ctx.lineWidth = 1;
-                for (let i = 0; i < 300; i += 30) {
+                for (let i = 0; i < 240; i += 24) {
                     ctx.beginPath();
                     ctx.moveTo(i, 0);
-                    ctx.lineTo(i, 200);
+                    ctx.lineTo(i, 120);
                     ctx.stroke();
                 }
-                for (let i = 0; i < 200; i += 25) {
+                for (let i = 0; i < 120; i += 20) {
                     ctx.beginPath();
                     ctx.moveTo(0, i);
-                    ctx.lineTo(300, i);
+                    ctx.lineTo(240, i);
                     ctx.stroke();
                 }
 
@@ -150,9 +150,9 @@
                 ctx.strokeStyle = '#00ff00';
                 ctx.lineWidth = 2;
                 ctx.beginPath();
-                for (let x = 0; x < 300; x++) {
-                    const y = 100 + Math.sin((x + Date.now() * 0.01) * 0.02) * 30 +
-                             Math.sin((x + Date.now() * 0.005) * 0.05) * 20;
+                for (let x = 0; x < 240; x++) {
+                    const y = 60 + Math.sin((x + Date.now() * 0.01) * 0.02) * 20 +
+                             Math.sin((x + Date.now() * 0.005) * 0.05) * 15;
                     if (x === 0) ctx.moveTo(x, y);
                     else ctx.lineTo(x, y);
                 }

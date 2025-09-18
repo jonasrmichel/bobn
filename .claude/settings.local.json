@@ -161,7 +161,9 @@
       "Bash(git init:*)",
       "Bash(git remote add:*)",
       "Bash(git config:*)",
-      "Bash(GOOS=js GOARCH=wasm go build -o bin/bobn.wasm ./cmd/wasm)"
+      "Bash(GOOS=js GOARCH=wasm go build -o bin/bobn.wasm ./cmd/wasm)",
+      "Read(//usr/local/go/misc/wasm/**)",
+      "Bash(git restore:*)"
     ],
     "deny": [],
     "ask": [],

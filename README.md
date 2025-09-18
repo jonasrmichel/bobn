@@ -23,7 +23,7 @@
 
 [![Go Version](https://img.shields.io/badge/Go-1.21+-00ADD8?style=for-the-badge&logo=go)](https://golang.org)
 [![WASM](https://img.shields.io/badge/WebAssembly-654FF0?style=for-the-badge&logo=webassembly&logoColor=white)](https://webassembly.org)
-[![License](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](LICENSE)
+[![License](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=for-the-badge)](LICENSE)
 
 **A retro arcade space shooter controlled by your head movements!**
 
@@ -302,13 +302,16 @@ invaderDropDistance: 20.0  // Pixels per drop
 ## 📜 License
 
 ```
-    ┌─────────────────────────┐
-    │   MIT License - 2024    │
-    │   Free to use & modify  │
-    └─────────────────────────┘
+    ┌────────────────────────────┐
+    │   Apache License 2.0       │
+    │   Copyright 2024           │
+    │   Jonas Michel             │
+    └────────────────────────────┘
 ```
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+This project is licensed under the Apache License, Version 2.0 - see the [LICENSE](LICENSE) file for details.
+
+You may obtain a copy of the License at: http://www.apache.org/licenses/LICENSE-2.0
 
 ---
 

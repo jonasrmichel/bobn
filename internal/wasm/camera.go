@@ -29,6 +29,7 @@ type CameraController struct {
 
 	// Motion detection
 	prevFrame     []uint8
+	currentFrame  []uint8  // Store current frame for ASCII generation
 	width         int
 	height        int
 
@@ -139,6 +140,17 @@ func (c *CameraController) processFrame() {
 	imageData := c.ctx.Call("getImageData", 0, 0, c.width, c.height)
 	data := imageData.Get("data")
 
+	// Store frame data for ASCII generation
+	frameSize := c.width * c.height * 4
+	if len(c.currentFrame) != frameSize {
+		c.currentFrame = make([]uint8, frameSize)
+	}
+
+	// Copy frame data
+	for i := 0; i < frameSize; i++ {
+		c.currentFrame[i] = uint8(data.Index(i).Int())
+	}
+
 	// Simple brightness-based motion detection
 	var sumX, sumY, totalBrightness float64
 	pixelCount := 0
@@ -149,9 +161,9 @@ func (c *CameraController) processFrame() {
 			idx := (y*c.width + x) * 4
 
 			// Get pixel brightness
-			r := data.Index(idx).Float()
-			g := data.Index(idx + 1).Float()
-			b := data.Index(idx + 2).Float()
+			r := float64(c.currentFrame[idx])
+			g := float64(c.currentFrame[idx+1])
+			b := float64(c.currentFrame[idx+2])
 			brightness := (r + g + b) / 3.0
 
 			// Only count bright pixels (likely face/head)
@@ -200,7 +212,7 @@ func (c *CameraController) processFrame() {
 	}
 }
 
-// updateOscilloscope updates the oscilloscope visualization
+// updateOscilloscope updates the oscilloscope visualization with ASCII art
 func (c *CameraController) updateOscilloscope(x, y float64) {
 	if !c.oscilloscope.Truthy() {
 		return
@@ -211,34 +223,45 @@ func (c *CameraController) updateOscilloscope(x, y float64) {
 	height := c.oscilloscope.Get("height").Float()
 
 	// Clear canvas
-	ctx.Call("clearRect", 0, 0, width, height)
+	ctx.Set("fillStyle", "#000000")
+	ctx.Call("fillRect", 0, 0, width, height)
 
-	// Draw grid
-	ctx.Set("strokeStyle", "#003300")
-	ctx.Set("lineWidth", 1)
-
-	// Vertical lines
-	for i := 0.0; i < width; i += width / 10 {
-		ctx.Call("beginPath")
-		ctx.Call("moveTo", i, 0)
-		ctx.Call("lineTo", i, height)
-		ctx.Call("stroke")
-	}
-
-	// Horizontal lines
-	for i := 0.0; i < height; i += height / 6 {
-		ctx.Call("beginPath")
-		ctx.Call("moveTo", 0, i)
-		ctx.Call("lineTo", width, i)
-		ctx.Call("stroke")
-	}
+	// Set font for ASCII art
+	ctx.Set("font", "10px monospace")
+	ctx.Set("fillStyle", "#00ff00")
+	ctx.Set("textAlign", "left")
+	ctx.Set("textBaseline", "top")
 
 	if c.tracking {
-		// Draw position indicator dot only
+		// Generate ASCII art representation of camera view
+		asciiArt := c.generateASCIIArt()
+
+		// Draw each line of ASCII art
+		lineHeight := 12.0
+		startY := 10.0
+
+		for i, line := range asciiArt {
+			ctx.Call("fillText", line, 10, startY+float64(i)*lineHeight)
+		}
+
+		// Draw position indicator at bottom
 		ctx.Set("fillStyle", "#ffff00")
-		ctx.Call("beginPath")
-		ctx.Call("arc", width/2+x*width/4, height/2+y*height/4, 5, 0, math.Pi*2)
-		ctx.Call("fill")
+		posText := "POS: ["
+		for i := 0; i < 10; i++ {
+			if float64(i-5)/5.0 < x && x <= float64(i-4)/5.0 {
+				posText += "■"
+			} else {
+				posText += "·"
+			}
+		}
+		posText += "]"
+		ctx.Call("fillText", posText, 10, height-20)
+	} else {
+		// Show "NO SIGNAL" when camera not active
+		ctx.Set("font", "16px monospace")
+		ctx.Set("fillStyle", "#00ff00")
+		ctx.Set("textAlign", "center")
+		ctx.Call("fillText", "NO SIGNAL", width/2, height/2)
 	}
 }
 
@@ -258,6 +281,89 @@ func (c *CameraController) SetPositionCallback(callback func(x, y float64)) {
 // IsEnabled returns whether camera is enabled
 func (c *CameraController) IsEnabled() bool {
 	return c.enabled
+}
+
+// generateASCIIArt generates ASCII art representation of the camera view
+func (c *CameraController) generateASCIIArt() []string {
+	if len(c.currentFrame) == 0 {
+		return []string{"NO DATA"}
+	}
+
+	// ASCII characters for different brightness levels
+	asciiChars := " .:-=+*#%@"
+
+	// Create smaller ASCII grid (sample the image)
+	asciiWidth := 30
+	asciiHeight := 12
+
+	lines := make([]string, asciiHeight)
+
+	// Calculate sampling intervals
+	xStep := c.width / asciiWidth
+	yStep := c.height / asciiHeight
+
+	for ay := 0; ay < asciiHeight; ay++ {
+		line := ""
+		for ax := 0; ax < asciiWidth; ax++ {
+			// Sample a region of pixels
+			x := ax * xStep
+			y := ay * yStep
+
+			// Average brightness in the region
+			var totalBrightness float64
+			sampleCount := 0
+
+			// Sample a few pixels in the region
+			for dy := 0; dy < yStep && y+dy < c.height; dy += 2 {
+				for dx := 0; dx < xStep && x+dx < c.width; dx += 2 {
+					idx := ((y+dy)*c.width + (x+dx)) * 4
+					if idx < len(c.currentFrame)-3 {
+						r := float64(c.currentFrame[idx])
+						g := float64(c.currentFrame[idx+1])
+						b := float64(c.currentFrame[idx+2])
+						brightness := (r + g + b) / 3.0
+
+						// Edge detection: look for significant brightness changes
+						isEdge := false
+						if x+dx+2 < c.width {
+							nextIdx := ((y+dy)*c.width + (x+dx+2)) * 4
+							if nextIdx < len(c.currentFrame)-3 {
+								nextR := float64(c.currentFrame[nextIdx])
+								nextG := float64(c.currentFrame[nextIdx+1])
+								nextB := float64(c.currentFrame[nextIdx+2])
+								nextBrightness := (nextR + nextG + nextB) / 3.0
+								if math.Abs(brightness-nextBrightness) > 50 {
+									isEdge = true
+								}
+							}
+						}
+
+						if isEdge {
+							brightness = 255 // Highlight edges
+						}
+
+						totalBrightness += brightness
+						sampleCount++
+					}
+				}
+			}
+
+			// Map brightness to ASCII character
+			if sampleCount > 0 {
+				avgBrightness := totalBrightness / float64(sampleCount)
+				charIndex := int(avgBrightness * float64(len(asciiChars)-1) / 255.0)
+				if charIndex >= len(asciiChars) {
+					charIndex = len(asciiChars) - 1
+				}
+				line += string(asciiChars[charIndex])
+			} else {
+				line += " "
+			}
+		}
+		lines[ay] = line
+	}
+
+	return lines
 }
 
 // StartCalibration starts the calibration process

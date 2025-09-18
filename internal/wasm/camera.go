@@ -33,6 +33,9 @@ type CameraController struct {
 	width         int
 	height        int
 
+	// Sensitivity
+	sensitivity   float64
+
 	// Callbacks
 	onPosition    func(x, y float64)
 	oscilloscope  js.Value
@@ -47,6 +50,7 @@ func NewCameraController() *CameraController {
 		rangeX: 0.3,
 		centerY: 0.5,
 		rangeY: 0.2,
+		sensitivity: 4.0, // Default sensitivity
 	}
 }
 
@@ -185,10 +189,18 @@ func (c *CameraController) processFrame() {
 		c.smoothedX = c.smoothedX*0.3 + centerX*0.7
 		c.smoothedY = c.smoothedY*0.3 + centerY*0.7
 
+		// Get sensitivity from JavaScript global variable
+		sensitivity := c.sensitivity
+		if window := js.Global().Get("window"); !window.IsUndefined() {
+			if cameraSens := window.Get("cameraSensitivity"); !cameraSens.IsUndefined() && !cameraSens.IsNull() {
+				sensitivity = cameraSens.Float()
+			}
+		}
+
 		// Convert to game coordinates (-1 to 1)
 		// Invert X because camera is mirrored
-		gameX := -((c.smoothedX - 0.5) * 4.0) // Increased sensitivity
-		gameY := (c.smoothedY - 0.5) * 4.0
+		gameX := -((c.smoothedX - 0.5) * sensitivity)
+		gameY := (c.smoothedY - 0.5) * sensitivity
 
 		// Smaller dead zone for more responsive control
 		if math.Abs(gameX) < 0.05 {
@@ -365,6 +377,22 @@ func (c *CameraController) generateASCIIArt() []string {
 	}
 
 	return lines
+}
+
+// SetSensitivity sets the camera sensitivity
+func (c *CameraController) SetSensitivity(sensitivity float64) {
+	c.sensitivity = sensitivity
+}
+
+// GetSensitivity returns the current sensitivity
+func (c *CameraController) GetSensitivity() float64 {
+	// Try to get from JavaScript first
+	if window := js.Global().Get("window"); !window.IsUndefined() {
+		if cameraSens := window.Get("cameraSensitivity"); !cameraSens.IsUndefined() && !cameraSens.IsNull() {
+			return cameraSens.Float()
+		}
+	}
+	return c.sensitivity
 }
 
 // StartCalibration starts the calibration process

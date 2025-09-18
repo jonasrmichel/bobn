@@ -683,3 +683,98 @@ body::before {
     background: var(--neon-green);
     color: var(--dark-bg);
 }
+
+/* Sensitivity Control */
+.sensitivity-control {
+    margin: 15px 0;
+    padding: 12px;
+    background: linear-gradient(135deg, #0f0f0f, #1a1a1a);
+    border: 2px solid var(--neon-green);
+    border-radius: 8px;
+    box-shadow:
+        0 0 10px rgba(0, 255, 0, 0.3),
+        inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.sensitivity-label {
+    color: var(--neon-green);
+    font-size: 11px;
+    font-weight: bold;
+    text-align: center;
+    margin-bottom: 10px;
+    text-shadow: 0 0 5px rgba(0, 255, 0, 0.5);
+    letter-spacing: 1px;
+}
+
+.sensitivity-slider-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 8px 0;
+}
+
+.slider-label {
+    color: var(--neon-cyan);
+    font-size: 9px;
+    font-weight: bold;
+    text-transform: uppercase;
+    min-width: 25px;
+}
+
+.sensitivity-slider {
+    flex: 1;
+    -webkit-appearance: none;
+    appearance: none;
+    height: 6px;
+    background: linear-gradient(90deg, #003300, var(--neon-green));
+    outline: none;
+    border-radius: 3px;
+    border: 1px solid var(--neon-green);
+    box-shadow: 0 0 8px rgba(0, 255, 0, 0.3);
+    cursor: pointer;
+}
+
+.sensitivity-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    background: radial-gradient(circle, var(--neon-green), #00cc00);
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid var(--neon-green);
+    box-shadow:
+        0 0 15px rgba(0, 255, 0, 0.8),
+        0 0 30px rgba(0, 255, 0, 0.4);
+    transition: all 0.1s ease;
+}
+
+.sensitivity-slider::-webkit-slider-thumb:hover {
+    transform: scale(1.2);
+    box-shadow:
+        0 0 20px rgba(0, 255, 0, 1),
+        0 0 40px rgba(0, 255, 0, 0.6);
+}
+
+.sensitivity-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    background: radial-gradient(circle, var(--neon-green), #00cc00);
+    cursor: pointer;
+    border-radius: 50%;
+    border: 2px solid var(--neon-green);
+    box-shadow:
+        0 0 15px rgba(0, 255, 0, 0.8),
+        0 0 30px rgba(0, 255, 0, 0.4);
+    transition: all 0.1s ease;
+}
+
+.sensitivity-value {
+    color: var(--neon-amber);
+    font-size: 14px;
+    font-weight: bold;
+    text-align: center;
+    margin-top: 5px;
+    text-shadow: 0 0 10px rgba(255, 191, 0, 0.5);
+    font-family: 'Courier New', monospace;
+}

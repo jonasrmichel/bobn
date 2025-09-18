@@ -88,6 +88,7 @@ func NewGame(canvas js.Value) *Game {
 
 // Start begins the game loop
 func (g *Game) Start() {
+	log.Println("Start() called - starting game loop")
 	g.running = true
 	g.gameLoop()
 }
@@ -99,6 +100,9 @@ func (g *Game) Stop() {
 
 // gameLoop runs the main game loop
 func (g *Game) gameLoop() {
+	log.Println("gameLoop started")
+	frameCount := 0
+
 	var renderFrame js.Func
 	renderFrame = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		if !g.running {
@@ -114,6 +118,11 @@ func (g *Game) gameLoop() {
 		deltaTime := currentTime - g.lastTime
 		g.lastTime = currentTime
 
+		frameCount++
+		if frameCount == 1 {
+			log.Println("First frame - calling update and render")
+		}
+
 		g.update(deltaTime)
 		g.render()
 
@@ -121,6 +130,7 @@ func (g *Game) gameLoop() {
 		return nil
 	})
 
+	log.Println("Calling requestAnimationFrame")
 	js.Global().Call("requestAnimationFrame", renderFrame)
 }
 
@@ -169,6 +179,16 @@ func (g *Game) render() {
 	g.ctx.Set("fillStyle", "#000000")
 	g.ctx.Call("fillRect", 0, 0, g.width, g.height)
 
+	// Always draw something to verify rendering
+	g.ctx.Set("fillStyle", "#ff00ff")
+	g.ctx.Call("fillRect", 10, 10, 30, 30)
+
+	// Draw "RENDER WORKING" text
+	g.ctx.Set("fillStyle", "#ffffff")
+	g.ctx.Set("font", "16px monospace")
+	g.ctx.Set("textAlign", "left")
+	g.ctx.Call("fillText", "RENDER WORKING", 50, 25)
+
 	if g.engine == nil {
 		// Show loading message if not ready
 		g.ctx.Set("fillStyle", "#00ff00")
@@ -180,6 +200,11 @@ func (g *Game) render() {
 
 	// Draw the game directly
 	state := g.engine.GetState()
+
+	// Show game state
+	g.ctx.Set("fillStyle", "#ffff00")
+	g.ctx.Set("textAlign", "left")
+	g.ctx.Call("fillText", fmt.Sprintf("Mode: %v", state.Mode), 10, 50)
 
 	// Draw stars background
 	g.ctx.Set("fillStyle", "#ffffff")
@@ -357,6 +382,7 @@ func initializeGame() {
 
 	// Start the game automatically
 	if game != nil {
+		log.Println("Game created, calling Start()")
 		game.Start()
 		log.Println("Game started successfully")
 	} else {

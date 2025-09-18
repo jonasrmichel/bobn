@@ -357,19 +357,6 @@ body::before {
     gap: 10px;
 }
 
-.button-group {
-    display: flex;
-    gap: 15px;
-    justify-content: center;
-}
-
-.credit-display {
-    color: var(--neon-amber);
-    font-weight: 700;
-    text-shadow: 0 0 4px var(--neon-amber);
-    margin-top: 8px;
-    font-size: 0.9rem;
-}
 
 /* Arcade Buttons */
 .arcade-button {
@@ -393,16 +380,11 @@ body::before {
     overflow: hidden;
 }
 
-.coin-button {
-    background: linear-gradient(145deg, #ffbf00, #cc9500);
-    box-shadow:
-        0 8px 0 #996600,
-        0 12px 20px rgba(0, 0, 0, 0.5),
-        inset 0 0 20px rgba(255, 255, 255, 0.2);
-}
 
 .start-button {
     background: linear-gradient(145deg, #00ff00, #00cc00);
+    width: 80px;
+    height: 80px;
     box-shadow:
         0 8px 0 #009900,
         0 12px 20px rgba(0, 0, 0, 0.5),
@@ -417,12 +399,6 @@ body::before {
         inset 0 0 20px rgba(255, 255, 255, 0.2);
 }
 
-.coin-button:active {
-    box-shadow:
-        0 4px 0 #996600,
-        0 8px 15px rgba(0, 0, 0, 0.5),
-        inset 0 0 20px rgba(255, 255, 255, 0.2);
-}
 
 .start-button:active {
     box-shadow:

@@ -74,17 +74,10 @@
             <!-- Control Panel -->
             <div class="control-panel">
                 <div class="coin-slot-section">
-                    <div class="button-group">
-                        <button id="insertCoinBtn" class="arcade-button coin-button">
-                            <div class="button-top"></div>
-                            <span>INSERT<br/>COIN</span>
-                        </button>
-                        <button id="startBtn" class="arcade-button start-button">
-                            <div class="button-top"></div>
-                            <span>START</span>
-                        </button>
-                    </div>
-                    <div id="creditDisplay" class="credit-display">CREDITS: 0</div>
+                    <button id="startBtn" class="arcade-button start-button">
+                        <div class="button-top"></div>
+                        <span>START<br/>GAME</span>
+                    </button>
                 </div>
 
                 <div class="instruction-panel">
@@ -108,7 +101,6 @@
     <script src="wasm_exec.js"></script>
     <script>
         const go = new Go();
-        let credits = 0;
         let gameInitialized = false;
 
         // Game state elements
@@ -116,12 +108,10 @@
             loadingMessage: document.getElementById('loadingMessage'),
             errorMessage: document.getElementById('errorMessage'),
             gameMessage: document.getElementById('gameMessage'),
-            creditDisplay: document.getElementById('creditDisplay'),
             scoreDisplay: document.getElementById('score'),
             highScoreDisplay: document.getElementById('highScore'),
             livesDisplay: document.getElementById('lives'),
             levelDisplay: document.getElementById('level'),
-            insertCoinBtn: document.getElementById('insertCoinBtn'),
             startBtn: document.getElementById('startBtn'),
             oscilloscope: document.getElementById('oscilloscope')
         };
@@ -166,34 +156,9 @@
             }, 50);
         }
 
-        // Update credit display
-        function updateCredits() {
-            elements.creditDisplay.textContent = `CREDITS: ${credits}`;
-        }
-
-        // Insert coin functionality
-        elements.insertCoinBtn.addEventListener('click', function() {
-            credits++;
-            updateCredits();
-
-            // Play coin sound effect (visual feedback)
-            this.style.transform = 'translateY(2px)';
-            setTimeout(() => {
-                this.style.transform = '';
-            }, 100);
-
-            if (gameInitialized && elements.gameMessage.style.display === 'none') {
-                elements.gameMessage.style.display = 'block';
-                elements.gameMessage.textContent = 'PRESS START TO PLAY';
-            }
-        });
-
         // Start button functionality
         elements.startBtn.addEventListener('click', function() {
-            if (credits > 0 && gameInitialized) {
-                credits--;
-                updateCredits();
-
+            if (gameInitialized) {
                 // Visual feedback
                 this.style.transform = 'translateY(2px)';
                 setTimeout(() => {
@@ -202,13 +167,13 @@
 
                 elements.gameMessage.textContent = 'GAME STARTING...';
 
-                // Simulate spacebar press to start game
-                const spacebarEvent = new KeyboardEvent('keydown', {
-                    key: ' ',
-                    code: 'Space',
-                    keyCode: 32
+                // Simulate Enter key press to start game
+                const enterEvent = new KeyboardEvent('keydown', {
+                    key: 'Enter',
+                    code: 'Enter',
+                    keyCode: 13
                 });
-                document.dispatchEvent(spacebarEvent);
+                document.dispatchEvent(enterEvent);
             }
         });
 
@@ -226,7 +191,7 @@
                 gameInitialized = true;
                 elements.loadingMessage.style.display = 'none';
                 elements.gameMessage.style.display = 'block';
-                elements.gameMessage.textContent = 'INSERT COIN TO PLAY';
+                elements.gameMessage.textContent = 'PRESS START TO PLAY';
 
             } catch (err) {
                 console.error('Failed to load WASM:', err);

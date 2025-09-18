@@ -115,6 +115,15 @@ func (g *Game) Stop() {
 // gameLoop runs the main game loop
 func (g *Game) gameLoop() {
 	log.Println("Setting up game loop...")
+
+	// Simple test - just draw immediately
+	g.ctx.Set("fillStyle", "#00ffff")
+	g.ctx.Call("fillRect", 100, 100, 100, 100)
+	g.ctx.Set("fillStyle", "#ffffff")
+	g.ctx.Set("font", "20px monospace")
+	g.ctx.Call("fillText", "WASM Drawing Works!", 150, 150)
+
+	frameCount := 0
 	var renderFrame js.Func
 	renderFrame = js.FuncOf(func(this js.Value, args []js.Value) interface{} {
 		if !g.running {
@@ -130,6 +139,11 @@ func (g *Game) gameLoop() {
 
 		deltaTime := currentTime - g.lastTime
 		g.lastTime = currentTime
+
+		frameCount++
+		if frameCount%60 == 0 {
+			log.Printf("Frame %d - calling update and render", frameCount)
+		}
 
 		g.update(deltaTime)
 		g.render()
@@ -183,13 +197,19 @@ func (g *Game) update(deltaTime float64) {
 
 // render handles drawing the game
 func (g *Game) render() {
-	// Clear the canvas
-	g.ctx.Set("fillStyle", "#000000")
-	g.ctx.Call("fillRect", 0, 0, g.width, g.height)
+	// Don't clear - just draw on top for debugging
+	// g.ctx.Set("fillStyle", "#000000")
+	// g.ctx.Call("fillRect", 0, 0, g.width, g.height)
 
-	// Test rectangle to verify drawing works
-	g.ctx.Set("fillStyle", "#ff0000")
-	g.ctx.Call("fillRect", 10, 10, 50, 50)
+	// Always draw a test rectangle to verify we're rendering
+	g.ctx.Set("fillStyle", "#ff00ff")
+	g.ctx.Call("fillRect", 20, 20, 60, 60)
+
+	// Draw frame counter
+	g.ctx.Set("fillStyle", "#00ff00")
+	g.ctx.Set("font", "16px monospace")
+	g.ctx.Set("textAlign", "left")
+	g.ctx.Call("fillText", fmt.Sprintf("Frame: %d", int(g.lastTime/100)), 10, 100)
 
 	if g.engine == nil {
 		// Show loading message if not ready

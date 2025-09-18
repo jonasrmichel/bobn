@@ -1,0 +1,591 @@
+/* BOBN Arcade Cabinet CSS - Retro 1980s Style */
+
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap');
+
+/* CSS Variables for Color Palette */
+:root {
+    --neon-green: #00ff00;
+    --neon-cyan: #00ffff;
+    --neon-magenta: #ff00ff;
+    --neon-amber: #ffbf00;
+    --neon-red: #ff0040;
+    --dark-bg: #0a0a0a;
+    --cabinet-dark: #1a1a1a;
+    --cabinet-medium: #2a2a2a;
+    --screen-black: #000000;
+    --phosphor-green: #00ff41;
+    --phosphor-amber: #ffb000;
+}
+
+/* Global Styles */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, var(--dark-bg) 0%, #1a0a1a 50%, var(--dark-bg) 100%);
+    color: var(--neon-green);
+    font-family: 'Orbitron', 'Courier New', monospace;
+    overflow-x: hidden;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* Background Grid Effect */
+body::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image:
+        linear-gradient(rgba(0, 255, 0, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 0, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+    pointer-events: none;
+    z-index: -1;
+    animation: gridMove 20s linear infinite;
+}
+
+@keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+}
+
+/* Main Arcade Cabinet */
+.arcade-cabinet {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    background: linear-gradient(180deg, var(--cabinet-dark) 0%, var(--cabinet-medium) 100%);
+    border: 3px solid var(--neon-green);
+    border-radius: 20px 20px 0 0;
+    box-shadow:
+        0 0 30px var(--neon-green),
+        inset 0 0 50px rgba(0, 255, 0, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+
+/* Cabinet Header with Neon Title */
+.cabinet-header {
+    text-align: center;
+    padding: 20px 0 30px;
+    background: radial-gradient(ellipse at center, rgba(0, 255, 0, 0.2) 0%, transparent 70%);
+}
+
+.neon-title {
+    position: relative;
+}
+
+.game-title {
+    font-size: 4rem;
+    font-weight: 900;
+    margin: 0;
+    color: var(--neon-green);
+    text-shadow:
+        0 0 10px var(--neon-green),
+        0 0 20px var(--neon-green),
+        0 0 40px var(--neon-green),
+        0 0 80px var(--neon-green);
+    animation: neonFlicker 2s infinite alternate;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+}
+
+.subtitle {
+    font-size: 1rem;
+    color: var(--neon-cyan);
+    text-shadow: 0 0 10px var(--neon-cyan);
+    letter-spacing: 0.2em;
+    margin-top: 10px;
+    animation: subtitleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes neonFlicker {
+    0%, 100% {
+        text-shadow:
+            0 0 10px var(--neon-green),
+            0 0 20px var(--neon-green),
+            0 0 40px var(--neon-green),
+            0 0 80px var(--neon-green);
+    }
+    50% {
+        text-shadow:
+            0 0 5px var(--neon-green),
+            0 0 10px var(--neon-green),
+            0 0 20px var(--neon-green),
+            0 0 40px var(--neon-green);
+    }
+}
+
+@keyframes subtitleGlow {
+    0% { opacity: 0.8; }
+    100% { opacity: 1; }
+}
+
+/* Main Screen Area */
+.screen-bezel {
+    background: linear-gradient(145deg, #333, #111);
+    padding: 20px;
+    border-radius: 15px;
+    margin: 20px 0;
+    box-shadow:
+        inset 0 0 20px rgba(0, 0, 0, 0.8),
+        0 0 20px rgba(0, 255, 0, 0.3);
+    position: relative;
+}
+
+.crt-container {
+    position: relative;
+    background: var(--screen-black);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: inset 0 0 50px rgba(0, 0, 0, 0.9);
+}
+
+.game-screen {
+    display: block;
+    width: 100%;
+    height: auto;
+    background: var(--screen-black);
+    position: relative;
+    z-index: 1;
+}
+
+/* CRT Effects */
+.crt-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%),
+        linear-gradient(transparent 50%, rgba(0, 255, 0, 0.03) 50%);
+    background-size: 100% 100%, 100% 4px;
+    pointer-events: none;
+    z-index: 2;
+}
+
+.scanlines {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: repeating-linear-gradient(
+        0deg,
+        transparent 0px,
+        transparent 2px,
+        rgba(0, 255, 0, 0.1) 2px,
+        rgba(0, 255, 0, 0.1) 4px
+    );
+    pointer-events: none;
+    z-index: 3;
+    animation: scanlineMove 0.1s linear infinite;
+}
+
+.screen-glow {
+    position: absolute;
+    top: -10px;
+    left: -10px;
+    right: -10px;
+    bottom: -10px;
+    background: radial-gradient(ellipse at center, var(--phosphor-green) 0%, transparent 60%);
+    opacity: 0.2;
+    pointer-events: none;
+    z-index: 0;
+    animation: screenFlicker 4s ease-in-out infinite alternate;
+}
+
+@keyframes scanlineMove {
+    0% { transform: translateY(0); }
+    100% { transform: translateY(4px); }
+}
+
+@keyframes screenFlicker {
+    0% { opacity: 0.2; }
+    100% { opacity: 0.3; }
+}
+
+/* Oscilloscope Section */
+.oscilloscope-section {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.oscilloscope-label {
+    color: var(--neon-amber);
+    font-size: 0.9rem;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-shadow: 0 0 5px var(--neon-amber);
+    margin-bottom: 10px;
+}
+
+.oscilloscope-bezel {
+    display: inline-block;
+    background: linear-gradient(145deg, #2a2a2a, #1a1a1a);
+    padding: 15px;
+    border-radius: 10px;
+    box-shadow:
+        inset 0 0 15px rgba(0, 0, 0, 0.8),
+        0 0 15px rgba(255, 191, 0, 0.3);
+    position: relative;
+}
+
+.oscilloscope-screen {
+    background: #001100;
+    border-radius: 5px;
+    display: block;
+    box-shadow: inset 0 0 20px rgba(0, 0, 0, 0.9);
+}
+
+.oscilloscope-overlay {
+    position: absolute;
+    top: 15px;
+    left: 15px;
+    right: 15px;
+    bottom: 15px;
+    background: radial-gradient(ellipse at center, transparent 0%, rgba(0, 0, 0, 0.3) 100%);
+    border-radius: 5px;
+    pointer-events: none;
+}
+
+/* Stats Panel */
+.stats-panel {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+    gap: 20px;
+    margin: 20px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(0, 255, 0, 0.1) 0%, rgba(0, 255, 255, 0.1) 100%);
+    border: 2px solid var(--neon-cyan);
+    border-radius: 10px;
+    box-shadow: 0 0 15px rgba(0, 255, 255, 0.3);
+}
+
+.stat-display {
+    text-align: center;
+    padding: 15px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--neon-green);
+    border-radius: 5px;
+    box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+}
+
+.stat-label {
+    font-size: 0.8rem;
+    color: var(--neon-amber);
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    margin-bottom: 5px;
+    text-shadow: 0 0 3px var(--neon-amber);
+}
+
+.stat-value {
+    font-size: 1.5rem;
+    color: var(--neon-green);
+    font-weight: 900;
+    text-shadow: 0 0 10px var(--neon-green);
+    font-family: 'Orbitron', monospace;
+}
+
+/* Control Panel */
+.control-panel {
+    display: grid;
+    grid-template-columns: 1fr 2fr;
+    gap: 30px;
+    padding: 30px;
+    background: linear-gradient(180deg, var(--cabinet-medium) 0%, var(--cabinet-dark) 100%);
+    border: 2px solid var(--neon-magenta);
+    border-radius: 15px;
+    margin: 20px 0;
+    box-shadow:
+        0 0 20px rgba(255, 0, 255, 0.3),
+        inset 0 0 30px rgba(0, 0, 0, 0.3);
+}
+
+.coin-slot-section {
+    text-align: center;
+}
+
+.credit-display {
+    color: var(--neon-amber);
+    font-weight: 700;
+    text-shadow: 0 0 5px var(--neon-amber);
+    margin-top: 15px;
+    font-size: 1.1rem;
+}
+
+/* Arcade Buttons */
+.arcade-button {
+    position: relative;
+    background: linear-gradient(145deg, #ff4444, #cc0000);
+    border: none;
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    cursor: pointer;
+    font-family: 'Orbitron', monospace;
+    font-weight: 700;
+    font-size: 0.8rem;
+    color: white;
+    text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+    box-shadow:
+        0 8px 0 #990000,
+        0 12px 20px rgba(0, 0, 0, 0.5),
+        inset 0 0 20px rgba(255, 255, 255, 0.2);
+    transition: all 0.1s;
+    overflow: hidden;
+}
+
+.coin-button {
+    background: linear-gradient(145deg, #ffbf00, #cc9500);
+    box-shadow:
+        0 8px 0 #996600,
+        0 12px 20px rgba(0, 0, 0, 0.5),
+        inset 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.start-button {
+    background: linear-gradient(145deg, #00ff00, #00cc00);
+    box-shadow:
+        0 8px 0 #009900,
+        0 12px 20px rgba(0, 0, 0, 0.5),
+        inset 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.arcade-button:active {
+    transform: translateY(4px);
+    box-shadow:
+        0 4px 0 #990000,
+        0 8px 15px rgba(0, 0, 0, 0.5),
+        inset 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.coin-button:active {
+    box-shadow:
+        0 4px 0 #996600,
+        0 8px 15px rgba(0, 0, 0, 0.5),
+        inset 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.start-button:active {
+    box-shadow:
+        0 4px 0 #009900,
+        0 8px 15px rgba(0, 0, 0, 0.5),
+        inset 0 0 20px rgba(255, 255, 255, 0.2);
+}
+
+.button-top {
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    height: 20px;
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.3) 0%, transparent 100%);
+    border-radius: 50% 50% 20px 20px;
+    pointer-events: none;
+}
+
+/* Instruction Panel */
+.instruction-panel {
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid var(--neon-cyan);
+    border-radius: 10px;
+    box-shadow: 0 0 10px rgba(0, 255, 255, 0.3);
+}
+
+.instructions-title {
+    color: var(--neon-cyan);
+    font-weight: 700;
+    font-size: 1.1rem;
+    text-shadow: 0 0 5px var(--neon-cyan);
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.control-item {
+    color: var(--neon-green);
+    font-size: 0.9rem;
+    margin: 8px 0;
+    padding-left: 10px;
+    border-left: 2px solid var(--neon-green);
+    text-shadow: 0 0 3px var(--neon-green);
+}
+
+/* Status Messages */
+.status-section {
+    text-align: center;
+    margin: 20px 0;
+    min-height: 60px;
+}
+
+.status-message {
+    padding: 15px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 1.1rem;
+    letter-spacing: 0.1em;
+    animation: statusPulse 2s ease-in-out infinite alternate;
+}
+
+.loading {
+    background: rgba(255, 191, 0, 0.2);
+    color: var(--neon-amber);
+    border: 2px solid var(--neon-amber);
+    text-shadow: 0 0 10px var(--neon-amber);
+}
+
+.error {
+    background: rgba(255, 0, 64, 0.2);
+    color: var(--neon-red);
+    border: 2px solid var(--neon-red);
+    text-shadow: 0 0 10px var(--neon-red);
+}
+
+.game-status {
+    background: rgba(0, 255, 0, 0.2);
+    color: var(--neon-green);
+    border: 2px solid var(--neon-green);
+    text-shadow: 0 0 10px var(--neon-green);
+}
+
+@keyframes statusPulse {
+    0% { opacity: 0.8; transform: scale(1); }
+    100% { opacity: 1; transform: scale(1.02); }
+}
+
+/* Background Effects */
+.background-effects {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    z-index: -1;
+}
+
+.grid-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image:
+        linear-gradient(rgba(0, 255, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(0, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 100px 100px;
+    animation: backgroundGrid 30s linear infinite;
+    opacity: 0.3;
+}
+
+.neon-glow-bg {
+    position: absolute;
+    top: 20%;
+    left: 10%;
+    right: 10%;
+    bottom: 20%;
+    background: radial-gradient(ellipse at center, rgba(0, 255, 0, 0.1) 0%, transparent 70%);
+    animation: backgroundGlow 8s ease-in-out infinite alternate;
+}
+
+@keyframes backgroundGrid {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(100px, 100px); }
+}
+
+@keyframes backgroundGlow {
+    0% { opacity: 0.3; }
+    100% { opacity: 0.6; }
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+    .arcade-cabinet {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .game-title {
+        font-size: 3rem;
+    }
+
+    .control-panel {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+}
+
+@media (max-width: 768px) {
+    .game-title {
+        font-size: 2.5rem;
+    }
+
+    .stats-panel {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .arcade-button {
+        width: 60px;
+        height: 60px;
+        font-size: 0.7rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .game-title {
+        font-size: 2rem;
+    }
+
+    .stats-panel {
+        grid-template-columns: 1fr;
+    }
+
+    .screen-bezel {
+        padding: 10px;
+    }
+
+    .control-panel {
+        padding: 15px;
+    }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+    width: 10px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--dark-bg);
+    border: 1px solid var(--neon-green);
+}
+
+::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--neon-green), var(--neon-cyan));
+    border-radius: 5px;
+    box-shadow: 0 0 5px var(--neon-green);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--neon-cyan), var(--neon-magenta));
+    box-shadow: 0 0 10px var(--neon-cyan);
+}
+
+/* Selection styling */
+::selection {
+    background: var(--neon-green);
+    color: var(--dark-bg);
+}
+
+::-moz-selection {
+    background: var(--neon-green);
+    color: var(--dark-bg);
+}

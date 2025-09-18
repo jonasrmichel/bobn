@@ -1,0 +1,1 @@
+Capture the current design discussion and save it to workflow/designs/{design-topic}.md for future reference. Provide sufficient detail that we can pick up the discussion from where we left off.

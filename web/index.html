@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BOBN - Camera Control Arcade</title>
+    <link rel="stylesheet" href="arcade.css">
+</head>
+<body>
+    <div class="arcade-cabinet">
+        <!-- Arcade Cabinet Header -->
+        <div class="cabinet-header">
+            <div class="neon-title">
+                <h1 class="game-title">BOBN</h1>
+                <div class="subtitle">CAMERA CONTROL ARCADE</div>
+            </div>
+        </div>
+
+        <!-- Main Game Screen Area -->
+        <div class="screen-bezel">
+            <div class="crt-container">
+                <canvas id="gameCanvas" width="800" height="600" class="game-screen"></canvas>
+                <div class="crt-overlay"></div>
+                <div class="scanlines"></div>
+                <div class="screen-glow"></div>
+            </div>
+        </div>
+
+        <!-- Oscilloscope for Camera Visualization -->
+        <div class="oscilloscope-section">
+            <div class="oscilloscope-label">CAMERA TRACKER</div>
+            <div class="oscilloscope-bezel">
+                <canvas id="oscilloscope" width="300" height="200" class="oscilloscope-screen"></canvas>
+                <div class="oscilloscope-overlay"></div>
+                <div class="oscilloscope-grid"></div>
+            </div>
+        </div>
+
+        <!-- Game Stats Display -->
+        <div class="stats-panel">
+            <div class="stat-display">
+                <div class="stat-label">SCORE</div>
+                <div id="scoreDisplay" class="stat-value">000000</div>
+            </div>
+            <div class="stat-display">
+                <div class="stat-label">HIGH SCORE</div>
+                <div id="highScoreDisplay" class="stat-value">000000</div>
+            </div>
+            <div class="stat-display">
+                <div class="stat-label">LIVES</div>
+                <div id="livesDisplay" class="stat-value">3</div>
+            </div>
+            <div class="stat-display">
+                <div class="stat-label">LEVEL</div>
+                <div id="levelDisplay" class="stat-value">1</div>
+            </div>
+        </div>
+
+        <!-- Control Panel -->
+        <div class="control-panel">
+            <div class="coin-slot-section">
+                <button id="insertCoinBtn" class="arcade-button coin-button">
+                    <div class="button-top"></div>
+                    <span>INSERT COIN</span>
+                </button>
+                <div id="creditDisplay" class="credit-display">CREDITS: 0</div>
+            </div>
+
+            <div class="game-controls">
+                <button id="startBtn" class="arcade-button start-button">
+                    <div class="button-top"></div>
+                    <span>START</span>
+                </button>
+
+                <div class="instruction-panel">
+                    <div class="instructions-title">CONTROLS</div>
+                    <div class="control-item">SPACEBAR - FIRE / PAUSE</div>
+                    <div class="control-item">ESC - STOP GAME</div>
+                    <div class="control-item">MOVE CAMERA - CONTROL SHIP</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Status Messages -->
+        <div class="status-section">
+            <div id="loadingMessage" class="status-message loading">
+                INITIALIZING SYSTEM...
+            </div>
+            <div id="errorMessage" class="status-message error" style="display: none;"></div>
+            <div id="gameMessage" class="status-message game-status" style="display: none;">
+                PRESS START TO PLAY
+            </div>
+        </div>
+
+        <!-- Retro Background Effects -->
+        <div class="background-effects">
+            <div class="grid-overlay"></div>
+            <div class="neon-glow-bg"></div>
+        </div>
+    </div>
+
+    <script src="wasm_exec.js"></script>
+    <script>
+        const go = new Go();
+        let credits = 0;
+        let gameInitialized = false;
+
+        // Game state elements
+        const elements = {
+            loadingMessage: document.getElementById('loadingMessage'),
+            errorMessage: document.getElementById('errorMessage'),
+            gameMessage: document.getElementById('gameMessage'),
+            creditDisplay: document.getElementById('creditDisplay'),
+            scoreDisplay: document.getElementById('scoreDisplay'),
+            highScoreDisplay: document.getElementById('highScoreDisplay'),
+            livesDisplay: document.getElementById('livesDisplay'),
+            levelDisplay: document.getElementById('levelDisplay'),
+            insertCoinBtn: document.getElementById('insertCoinBtn'),
+            startBtn: document.getElementById('startBtn'),
+            oscilloscope: document.getElementById('oscilloscope')
+        };
+
+        // Initialize oscilloscope
+        function initOscilloscope() {
+            const ctx = elements.oscilloscope.getContext('2d');
+            ctx.strokeStyle = '#00ff00';
+            ctx.lineWidth = 2;
+
+            // Draw initial grid/waveform
+            setInterval(() => {
+                ctx.clearRect(0, 0, 300, 200);
+
+                // Draw grid
+                ctx.strokeStyle = '#003300';
+                ctx.lineWidth = 1;
+                for (let i = 0; i < 300; i += 30) {
+                    ctx.beginPath();
+                    ctx.moveTo(i, 0);
+                    ctx.lineTo(i, 200);
+                    ctx.stroke();
+                }
+                for (let i = 0; i < 200; i += 25) {
+                    ctx.beginPath();
+                    ctx.moveTo(0, i);
+                    ctx.lineTo(300, i);
+                    ctx.stroke();
+                }
+
+                // Draw animated waveform
+                ctx.strokeStyle = '#00ff00';
+                ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let x = 0; x < 300; x++) {
+                    const y = 100 + Math.sin((x + Date.now() * 0.01) * 0.02) * 30 +
+                             Math.sin((x + Date.now() * 0.005) * 0.05) * 20;
+                    if (x === 0) ctx.moveTo(x, y);
+                    else ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+            }, 50);
+        }
+
+        // Update credit display
+        function updateCredits() {
+            elements.creditDisplay.textContent = `CREDITS: ${credits}`;
+        }
+
+        // Insert coin functionality
+        elements.insertCoinBtn.addEventListener('click', function() {
+            credits++;
+            updateCredits();
+
+            // Play coin sound effect (visual feedback)
+            this.style.transform = 'translateY(2px)';
+            setTimeout(() => {
+                this.style.transform = '';
+            }, 100);
+
+            if (gameInitialized && elements.gameMessage.style.display === 'none') {
+                elements.gameMessage.style.display = 'block';
+                elements.gameMessage.textContent = 'PRESS START TO PLAY';
+            }
+        });
+
+        // Start button functionality
+        elements.startBtn.addEventListener('click', function() {
+            if (credits > 0 && gameInitialized) {
+                credits--;
+                updateCredits();
+
+                // Visual feedback
+                this.style.transform = 'translateY(2px)';
+                setTimeout(() => {
+                    this.style.transform = '';
+                }, 100);
+
+                elements.gameMessage.textContent = 'GAME STARTING...';
+
+                // Simulate spacebar press to start game
+                const spacebarEvent = new KeyboardEvent('keydown', {
+                    key: ' ',
+                    code: 'Space',
+                    keyCode: 32
+                });
+                document.dispatchEvent(spacebarEvent);
+            }
+        });
+
+        async function loadWasm() {
+            try {
+                elements.loadingMessage.textContent = 'LOADING WASM MODULE...';
+
+                const result = await WebAssembly.instantiateStreaming(fetch("main.wasm"), go.importObject);
+
+                elements.loadingMessage.textContent = 'WASM MODULE LOADED! INITIALIZING...';
+
+                go.run(result.instance);
+
+                // Game initialization complete
+                setTimeout(() => {
+                    elements.loadingMessage.style.display = 'none';
+                    elements.gameMessage.style.display = 'block';
+                    elements.gameMessage.textContent = 'INSERT COIN TO PLAY';
+                    gameInitialized = true;
+                    initOscilloscope();
+                }, 1000);
+
+            } catch (error) {
+                console.error('Failed to load WASM:', error);
+                elements.loadingMessage.style.display = 'none';
+                elements.errorMessage.style.display = 'block';
+                elements.errorMessage.textContent = `SYSTEM ERROR: ${error.message}`;
+            }
+        }
+
+        // Load WASM when page is ready
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadWasm);
+        } else {
+            loadWasm();
+        }
+
+        // Enhanced keyboard handling
+        document.addEventListener('keydown', function(event) {
+            // Prevent default behavior for game controls
+            if (event.key === ' ' || event.key === 'Escape') {
+                event.preventDefault();
+            }
+
+            // Cheat code for free credits (Konami code inspired)
+            if (event.key === 'c' && event.ctrlKey) {
+                credits += 5;
+                updateCredits();
+            }
+        });
+
+        // Initialize displays
+        updateCredits();
+    </script>
+</body>
+</html>

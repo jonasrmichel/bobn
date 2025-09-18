@@ -160,20 +160,19 @@ func (g *Game) update(deltaTime float64) {
 
 // render handles drawing the game
 func (g *Game) render() {
-	// Clear the canvas
-	g.ctx.Set("fillStyle", "#000000")
-	g.ctx.Call("fillRect", 0, 0, g.width, g.height)
-
-	// Draw test text to verify canvas is working
-	g.ctx.Set("fillStyle", "#00ff00")
-	g.ctx.Set("font", "20px monospace")
-	g.ctx.Set("textAlign", "center")
-	g.ctx.Call("fillText", "BOBN GAME LOADING...", g.width/2, g.height/2)
-
-	// Try to render the actual game
-	if g.renderer != nil && g.engine != nil {
-		g.renderer.RenderGame(g.engine.GetState())
+	if g.engine == nil || g.renderer == nil {
+		// Show loading message if not ready
+		g.ctx.Set("fillStyle", "#000000")
+		g.ctx.Call("fillRect", 0, 0, g.width, g.height)
+		g.ctx.Set("fillStyle", "#00ff00")
+		g.ctx.Set("font", "20px monospace")
+		g.ctx.Set("textAlign", "center")
+		g.ctx.Call("fillText", "INITIALIZING...", g.width/2, g.height/2)
+		return
 	}
+
+	// Use the renderer to draw the game
+	g.renderer.RenderGame(g.engine.GetState())
 }
 
 // updateUI updates the HTML UI elements

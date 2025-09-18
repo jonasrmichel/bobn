@@ -35,6 +35,10 @@ func (r *Renderer) SetContext(ctx js.Value) {
 
 // Clear clears the canvas
 func (r *Renderer) Clear() {
+	if !r.ctx.Truthy() {
+		return // Context not set
+	}
+
 	r.ctx.Call("clearRect", 0, 0, r.screenWidth, r.screenHeight)
 
 	// Draw starfield background
@@ -63,7 +67,12 @@ func (r *Renderer) drawStarfield() {
 
 // RenderGame renders the entire game state
 func (r *Renderer) RenderGame(state *game.GameState) {
+	// Clear and draw background
 	r.Clear()
+
+	// Debug: Draw something to verify renderer works
+	r.ctx.Set("fillStyle", "#00ff00")
+	r.ctx.Call("fillRect", 10, 10, 50, 50)
 
 	switch state.Mode {
 	case game.AttractMode:
@@ -74,6 +83,9 @@ func (r *Renderer) RenderGame(state *game.GameState) {
 		r.renderGameOverMode(state)
 	case game.HighScore:
 		r.renderHighScoreMode(state)
+	default:
+		// If no mode, show default screen
+		r.renderAttractMode(state)
 	}
 
 	// Always render UI elements
@@ -293,7 +305,12 @@ func (r *Renderer) renderUFO(ufo *game.UFO) {
 
 // drawText renders text to the canvas
 func (r *Renderer) drawText(text string, x, y int, size int, color, align string) {
-	r.ctx.Set("font", fmt.Sprintf("%dpx 'Press Start 2P', monospace", size))
+	if !r.ctx.Truthy() {
+		return
+	}
+
+	// Use a fallback font that's guaranteed to work
+	r.ctx.Set("font", fmt.Sprintf("%dpx monospace", size))
 	r.ctx.Set("fillStyle", color)
 	r.ctx.Set("textAlign", align)
 	r.ctx.Set("textBaseline", "middle")

@@ -144,9 +144,9 @@ func (c *CameraController) processFrame() {
 	var sumX, sumY, totalBrightness float64
 	pixelCount := 0
 
-	// Sample every 4th pixel for performance
-	for y := 0; y < c.height; y += 4 {
-		for x := 0; x < c.width; x += 4 {
+	// Sample every 8th pixel for better performance
+	for y := 0; y < c.height; y += 8 {
+		for x := 0; x < c.width; x += 8 {
 			idx := (y*c.width + x) * 4
 
 			// Get pixel brightness
@@ -156,7 +156,7 @@ func (c *CameraController) processFrame() {
 			brightness := (r + g + b) / 3.0
 
 			// Only count bright pixels (likely face/head)
-			if brightness > 100 {
+			if brightness > 80 { // Lower threshold for better detection
 				sumX += float64(x) * brightness
 				sumY += float64(y) * brightness
 				totalBrightness += brightness
@@ -170,20 +170,20 @@ func (c *CameraController) processFrame() {
 		centerX := sumX / totalBrightness / float64(c.width)
 		centerY := sumY / totalBrightness / float64(c.height)
 
-		// Smooth the values
-		c.smoothedX = c.smoothedX*0.7 + centerX*0.3
-		c.smoothedY = c.smoothedY*0.7 + centerY*0.3
+		// Less smoothing for more responsive control
+		c.smoothedX = c.smoothedX*0.3 + centerX*0.7
+		c.smoothedY = c.smoothedY*0.3 + centerY*0.7
 
 		// Convert to game coordinates (-1 to 1)
 		// Invert X because camera is mirrored
-		gameX := -((c.smoothedX - 0.5) * 2.0)
-		gameY := (c.smoothedY - 0.5) * 2.0
+		gameX := -((c.smoothedX - 0.5) * 4.0) // Increased sensitivity
+		gameY := (c.smoothedY - 0.5) * 4.0
 
-		// Apply dead zone
-		if math.Abs(gameX) < 0.1 {
+		// Smaller dead zone for more responsive control
+		if math.Abs(gameX) < 0.05 {
 			gameX = 0
 		}
-		if math.Abs(gameY) < 0.1 {
+		if math.Abs(gameY) < 0.05 {
 			gameY = 0
 		}
 

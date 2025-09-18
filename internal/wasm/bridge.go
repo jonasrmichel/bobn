@@ -22,6 +22,7 @@ type JSBridge struct {
 
 	// Input state tracking
 	keysPressed map[string]bool
+	keysJustPressed map[string]bool
 
 	// Animation frame callback
 	animationCallback js.Func
@@ -39,6 +40,7 @@ func NewJSBridge() *JSBridge {
 		document:    js.Global().Get("document"),
 		window:      js.Global(),
 		keysPressed: make(map[string]bool),
+		keysJustPressed: make(map[string]bool),
 		deviceRatio: 1.0,
 	}
 
@@ -75,13 +77,16 @@ func (b *JSBridge) GetInputState() InputState {
 		UpPressed:        b.keysPressed["ArrowUp"],
 		DownPressed:      b.keysPressed["ArrowDown"],
 		FirePressed:      b.keysPressed[" "] || b.keysPressed["Space"],
-		FireJustPressed:  false, // This would need special handling for just pressed
-		PauseJustPressed: false, // This would need special handling
-		EnterJustPressed: false, // This would need special handling
+		FireJustPressed:  b.keysJustPressed[" "] || b.keysJustPressed["Space"],
+		PauseJustPressed: b.keysJustPressed["Escape"] || b.keysJustPressed["p"] || b.keysJustPressed["P"],
+		EnterJustPressed: b.keysJustPressed["Enter"],
 	}
 
-	// For now, we'll treat all presses as continuous
-	// A proper implementation would track key down events separately
+	// Clear just pressed keys after reading
+	for key := range b.keysJustPressed {
+		b.keysJustPressed[key] = false
+	}
+
 	return state
 }
 
@@ -143,6 +148,14 @@ func (b *JSBridge) setupEventListeners() {
 		event := args[0]
 		key := event.Get("key").String()
 		code := event.Get("code").String()
+
+		// Track just pressed only if key wasn't already pressed
+		if !b.keysPressed[key] {
+			b.keysJustPressed[key] = true
+		}
+		if !b.keysPressed[code] {
+			b.keysJustPressed[code] = true
+		}
 
 		b.keysPressed[key] = true
 		b.keysPressed[code] = true

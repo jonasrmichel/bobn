@@ -146,12 +146,12 @@ func (g *Game) update(deltaTime float64) {
 		input := g.bridge.GetInputState()
 
 		// Merge camera input with keyboard input
-		leftPressed := input.LeftPressed || (g.camera.IsEnabled() && g.cameraX < -0.3)
-		rightPressed := input.RightPressed || (g.camera.IsEnabled() && g.cameraX > 0.3)
+		leftPressed := input.LeftPressed || (g.camera.IsEnabled() && g.cameraX < -0.2)
+		rightPressed := input.RightPressed || (g.camera.IsEnabled() && g.cameraX > 0.2)
 
 		// Auto-fire when camera is enabled and player is moving
 		firePressed := input.FirePressed
-		if g.camera.IsEnabled() && math.Abs(g.cameraY) < 0.3 {
+		if g.camera.IsEnabled() && math.Abs(g.cameraY) < 0.2 {
 			// Fire when head is centered vertically
 			firePressed = true
 		}
@@ -175,88 +175,82 @@ func (g *Game) update(deltaTime float64) {
 
 // render handles drawing the game
 func (g *Game) render() {
-	// Clear the canvas
-	g.ctx.Set("fillStyle", "#000000")
-	g.ctx.Call("fillRect", 0, 0, g.width, g.height)
+	// Use the stored context
+	ctx := g.ctx
 
-	// Always draw something to verify rendering
-	g.ctx.Set("fillStyle", "#ff00ff")
-	g.ctx.Call("fillRect", 10, 10, 30, 30)
+	// Check if context is valid
+	if !ctx.Truthy() {
+		log.Println("ERROR: Canvas context is not valid!")
+		return
+	}
 
-	// Draw "RENDER WORKING" text
-	g.ctx.Set("fillStyle", "#ffffff")
-	g.ctx.Set("font", "16px monospace")
-	g.ctx.Set("textAlign", "left")
-	g.ctx.Call("fillText", "RENDER WORKING", 50, 25)
+	// Clear canvas
+	ctx.Set("fillStyle", "#000000")
+	ctx.Call("fillRect", 0, 0, g.width, g.height)
 
 	if g.engine == nil {
 		// Show loading message if not ready
-		g.ctx.Set("fillStyle", "#00ff00")
-		g.ctx.Set("font", "20px monospace")
-		g.ctx.Set("textAlign", "center")
-		g.ctx.Call("fillText", "ENGINE NOT INITIALIZED", g.width/2, g.height/2)
+		ctx.Set("fillStyle", "#00ff00")
+		ctx.Set("font", "20px monospace")
+		ctx.Set("textAlign", "center")
+		ctx.Call("fillText", "ENGINE NOT INITIALIZED", g.width/2, g.height/2)
 		return
 	}
 
 	// Draw the game directly
 	state := g.engine.GetState()
 
-	// Show game state
-	g.ctx.Set("fillStyle", "#ffff00")
-	g.ctx.Set("textAlign", "left")
-	g.ctx.Call("fillText", fmt.Sprintf("Mode: %v", state.Mode), 10, 50)
-
 	// Draw stars background
-	g.ctx.Set("fillStyle", "#ffffff")
+	ctx.Set("fillStyle", "#ffffff")
 	for i := 0; i < 50; i++ {
 		x := (i * 73) % g.width
 		y := (i * 37) % g.height
-		g.ctx.Call("fillRect", x, y, 2, 2)
+		ctx.Call("fillRect", x, y, 2, 2)
 	}
 
 	// Draw game based on mode
 	switch state.Mode {
 	case game.AttractMode:
 		// Draw title
-		g.ctx.Set("fillStyle", "#00ff00")
-		g.ctx.Set("font", "48px monospace")
-		g.ctx.Set("textAlign", "center")
-		g.ctx.Set("textBaseline", "middle")
-		g.ctx.Call("fillText", "BOBN", g.width/2, 150)
+		ctx.Set("fillStyle", "#00ff00")
+		ctx.Set("font", "48px monospace")
+		ctx.Set("textAlign", "center")
+		ctx.Set("textBaseline", "middle")
+		ctx.Call("fillText", "BOBN", g.width/2, 150)
 
-		g.ctx.Set("font", "20px monospace")
-		g.ctx.Set("fillStyle", "#00ffff")
-		g.ctx.Call("fillText", "SPACE INVADERS", g.width/2, 200)
+		ctx.Set("font", "20px monospace")
+		ctx.Set("fillStyle", "#00ffff")
+		ctx.Call("fillText", "SPACE INVADERS", g.width/2, 200)
 
 		// Instructions
-		g.ctx.Set("font", "16px monospace")
-		g.ctx.Set("fillStyle", "#ffff00")
-		g.ctx.Call("fillText", "PRESS ENTER TO START", g.width/2, 300)
-		g.ctx.Call("fillText", "USE ARROWS TO MOVE", g.width/2, 330)
-		g.ctx.Call("fillText", "SPACE TO FIRE", g.width/2, 360)
+		ctx.Set("font", "16px monospace")
+		ctx.Set("fillStyle", "#ffff00")
+		ctx.Call("fillText", "PRESS ENTER TO START", g.width/2, 300)
+		ctx.Call("fillText", "USE ARROWS TO MOVE", g.width/2, 330)
+		ctx.Call("fillText", "SPACE TO FIRE", g.width/2, 360)
 
 	case game.Playing:
 		// Draw player ship
 		if state.Player != nil && state.Player.Alive {
-			g.ctx.Set("fillStyle", "#00ff00")
+			ctx.Set("fillStyle", "#00ff00")
 			// Simple triangle ship
-			g.ctx.Call("beginPath")
-			g.ctx.Call("moveTo", state.Player.Position.X, state.Player.Position.Y)
-			g.ctx.Call("lineTo", state.Player.Position.X-15, state.Player.Position.Y+20)
-			g.ctx.Call("lineTo", state.Player.Position.X+15, state.Player.Position.Y+20)
-			g.ctx.Call("closePath")
-			g.ctx.Call("fill")
+			ctx.Call("beginPath")
+			ctx.Call("moveTo", state.Player.Position.X, state.Player.Position.Y)
+			ctx.Call("lineTo", state.Player.Position.X-15, state.Player.Position.Y+20)
+			ctx.Call("lineTo", state.Player.Position.X+15, state.Player.Position.Y+20)
+			ctx.Call("closePath")
+			ctx.Call("fill")
 		}
 
 		// Draw invaders
 		for _, invader := range state.Invaders {
 			if invader.Alive {
-				g.ctx.Set("fillStyle", "#ff00ff")
-				g.ctx.Call("fillRect", invader.Position.X-10, invader.Position.Y-5, 20, 10)
+				ctx.Set("fillStyle", "#ff00ff")
+				ctx.Call("fillRect", invader.Position.X-10, invader.Position.Y-5, 20, 10)
 				// Eyes
-				g.ctx.Set("fillStyle", "#000000")
-				g.ctx.Call("fillRect", invader.Position.X-6, invader.Position.Y-2, 3, 3)
-				g.ctx.Call("fillRect", invader.Position.X+3, invader.Position.Y-2, 3, 3)
+				ctx.Set("fillStyle", "#000000")
+				ctx.Call("fillRect", invader.Position.X-6, invader.Position.Y-2, 3, 3)
+				ctx.Call("fillRect", invader.Position.X+3, invader.Position.Y-2, 3, 3)
 			}
 		}
 
@@ -264,42 +258,42 @@ func (g *Game) render() {
 		for _, bullet := range state.Bullets {
 			if bullet.Alive {
 				if bullet.IsPlayerBullet {
-					g.ctx.Set("fillStyle", "#00ff00")
+					ctx.Set("fillStyle", "#00ff00")
 				} else {
-					g.ctx.Set("fillStyle", "#ff0000")
+					ctx.Set("fillStyle", "#ff0000")
 				}
-				g.ctx.Call("fillRect", bullet.Position.X-1, bullet.Position.Y, 2, 8)
+				ctx.Call("fillRect", bullet.Position.X-1, bullet.Position.Y, 2, 8)
 			}
 		}
 
 	case game.GameOver:
-		g.ctx.Set("fillStyle", "#ff0000")
-		g.ctx.Set("font", "48px monospace")
-		g.ctx.Set("textAlign", "center")
-		g.ctx.Call("fillText", "GAME OVER", g.width/2, g.height/2)
+		ctx.Set("fillStyle", "#ff0000")
+		ctx.Set("font", "48px monospace")
+		ctx.Set("textAlign", "center")
+		ctx.Call("fillText", "GAME OVER", g.width/2, g.height/2)
 
-		g.ctx.Set("font", "20px monospace")
-		g.ctx.Set("fillStyle", "#ffffff")
-		g.ctx.Call("fillText", fmt.Sprintf("SCORE: %d", state.Score), g.width/2, g.height/2+50)
+		ctx.Set("font", "20px monospace")
+		ctx.Set("fillStyle", "#ffffff")
+		ctx.Call("fillText", fmt.Sprintf("SCORE: %d", state.Score), g.width/2, g.height/2+50)
 	}
 
 	// Draw UI (score, lives, etc)
-	g.ctx.Set("fillStyle", "#ffffff")
-	g.ctx.Set("font", "16px monospace")
-	g.ctx.Set("textAlign", "left")
-	g.ctx.Call("fillText", fmt.Sprintf("SCORE: %06d", state.Score), 10, 30)
+	ctx.Set("fillStyle", "#ffffff")
+	ctx.Set("font", "16px monospace")
+	ctx.Set("textAlign", "left")
+	ctx.Call("fillText", fmt.Sprintf("SCORE: %06d", state.Score), 10, 30)
 
-	g.ctx.Set("textAlign", "center")
-	g.ctx.Call("fillText", fmt.Sprintf("HIGH: %06d", state.HighScore), g.width/2, 30)
+	ctx.Set("textAlign", "center")
+	ctx.Call("fillText", fmt.Sprintf("HIGH: %06d", state.HighScore), g.width/2, 30)
 
-	g.ctx.Set("textAlign", "right")
-	g.ctx.Call("fillText", fmt.Sprintf("LIVES: %d", state.Lives), g.width-10, 30)
+	ctx.Set("textAlign", "right")
+	ctx.Call("fillText", fmt.Sprintf("LIVES: %d", state.Lives), g.width-10, 30)
 
 	// Draw wave number
 	if state.Mode == game.Playing {
-		g.ctx.Set("textAlign", "center")
-		g.ctx.Set("fillStyle", "#00ffff")
-		g.ctx.Call("fillText", fmt.Sprintf("WAVE %d", state.Wave), g.width/2, g.height-20)
+		ctx.Set("textAlign", "center")
+		ctx.Set("fillStyle", "#00ffff")
+		ctx.Call("fillText", fmt.Sprintf("WAVE %d", state.Wave), g.width/2, g.height-20)
 	}
 }
 
@@ -309,31 +303,31 @@ func (g *Game) updateUI() {
 	doc := js.Global().Get("document")
 
 	// Update score
-	if scoreElem := doc.Call("getElementById", "score"); !scoreElem.IsUndefined() {
+	if scoreElem := doc.Call("getElementById", "score"); !scoreElem.IsUndefined() && !scoreElem.IsNull() {
 		scoreElem.Set("textContent", fmt.Sprintf("%06d", state.Score))
 	}
 
 	// Update high score
-	if highScoreElem := doc.Call("getElementById", "highScore"); !highScoreElem.IsUndefined() {
+	if highScoreElem := doc.Call("getElementById", "highScore"); !highScoreElem.IsUndefined() && !highScoreElem.IsNull() {
 		highScoreElem.Set("textContent", fmt.Sprintf("%06d", state.HighScore))
 	}
 
 	// Update lives
-	if livesElem := doc.Call("getElementById", "lives"); !livesElem.IsUndefined() {
+	if livesElem := doc.Call("getElementById", "lives"); !livesElem.IsUndefined() && !livesElem.IsNull() {
 		livesElem.Set("textContent", fmt.Sprintf("%d", state.Lives))
 	}
 
 	// Update level
-	if levelElem := doc.Call("getElementById", "level"); !levelElem.IsUndefined() {
+	if levelElem := doc.Call("getElementById", "level"); !levelElem.IsUndefined() && !levelElem.IsNull() {
 		levelElem.Set("textContent", fmt.Sprintf("%d", state.Wave))
 	}
 
 	// Update status message
-	if statusElem := doc.Call("getElementById", "status"); !statusElem.IsUndefined() {
+	if statusElem := doc.Call("getElementById", "status"); !statusElem.IsUndefined() && !statusElem.IsNull() {
 		var status string
 		switch state.Mode {
 		case game.AttractMode:
-			status = "INSERT COIN TO PLAY"
+			status = "PRESS START TO PLAY"
 		case game.Playing:
 			status = "PLAYING"
 		case game.GameOver:

@@ -6,16 +6,28 @@ import (
 	"log"
 	"syscall/js"
 	"time"
+
+	"github.com/jonasrmichel/bobn/internal/game"
+	"github.com/jonasrmichel/bobn/internal/wasm"
 )
 
 // Game represents the main game state
 type Game struct {
-	canvas   js.Value
-	ctx      js.Value
-	width    int
-	height   int
-	running  bool
-	lastTime float64
+	canvas    js.Value
+	ctx       js.Value
+	width     int
+	height    int
+	running   bool
+	lastTime  float64
+
+	// Game components
+	bridge    *wasm.JSBridge
+	renderer  *wasm.Renderer
+	engine    *game.Engine
+
+	// Timing
+	accumulator float64
+	frameTime   float64
 }
 
 // NewGame creates a new game instance
@@ -24,11 +36,22 @@ func NewGame(canvas js.Value) *Game {
 	width := canvas.Get("width").Int()
 	height := canvas.Get("height").Int()
 
+	// Initialize game components
+	bridge := wasm.NewJSBridge()
+	bridge.Initialize("gameCanvas")
+
+	engine := game.NewEngine(width, height)
+	renderer := wasm.NewRenderer(bridge, width, height)
+
 	return &Game{
-		canvas: canvas,
-		ctx:    ctx,
-		width:  width,
-		height: height,
+		canvas:      canvas,
+		ctx:         ctx,
+		width:       width,
+		height:      height,
+		bridge:      bridge,
+		engine:      engine,
+		renderer:    renderer,
+		frameTime:   1000.0 / 60.0, // 60 FPS target
 	}
 }
 
@@ -70,35 +93,80 @@ func (g *Game) gameLoop() {
 	js.Global().Call("requestAnimationFrame", renderFrame)
 }
 
-// update handles game logic updates
+// update handles game logic updates with fixed timestep
 func (g *Game) update(deltaTime float64) {
-	// TODO: Implement game logic updates
-	// This will include:
-	// - Camera input processing
-	// - Player movement detection
-	// - Enemy movement
-	// - Collision detection
-	// - Score updates
+	// Fixed timestep accumulator pattern for consistent physics
+	g.accumulator += deltaTime
+
+	// Fixed update step (50ms = 20Hz)
+	fixedTimeStep := 50.0
+	for g.accumulator >= fixedTimeStep {
+		// Get input state from bridge
+		input := g.bridge.GetInputState()
+
+		// Process input and update game state
+		g.engine.ProcessInput(
+			input.LeftPressed,
+			input.RightPressed,
+			input.FirePressed,
+			input.FireJustPressed,
+			input.PauseJustPressed || input.EnterJustPressed,
+		)
+		g.engine.Update(fixedTimeStep / 1000.0) // Convert to seconds
+
+		g.accumulator -= fixedTimeStep
+	}
+
+	// Update UI elements in HTML
+	g.updateUI()
 }
 
 // render handles drawing the game
 func (g *Game) render() {
-	// Clear canvas
-	g.ctx.Set("fillStyle", "#000000")
-	g.ctx.Call("fillRect", 0, 0, g.width, g.height)
+	// Render the game using the renderer
+	g.renderer.RenderGame(g.engine.GetState())
+}
 
-	// TODO: Implement game rendering
-	// This will include:
-	// - Drawing player
-	// - Drawing enemies
-	// - Drawing projectiles
-	// - Drawing UI elements (score, lives, etc.)
+// updateUI updates the HTML UI elements
+func (g *Game) updateUI() {
+	state := g.engine.GetState()
+	doc := js.Global().Get("document")
 
-	// Placeholder: Draw a simple message
-	g.ctx.Set("fillStyle", "#00FF00")
-	g.ctx.Set("font", "24px Arial")
-	g.ctx.Set("textAlign", "center")
-	g.ctx.Call("fillText", "BOBN - Camera Ready!", g.width/2, g.height/2)
+	// Update score
+	if scoreElem := doc.Call("getElementById", "score"); !scoreElem.IsUndefined() {
+		scoreElem.Set("textContent", fmt.Sprintf("%06d", state.Score))
+	}
+
+	// Update high score
+	if highScoreElem := doc.Call("getElementById", "highScore"); !highScoreElem.IsUndefined() {
+		highScoreElem.Set("textContent", fmt.Sprintf("%06d", state.HighScore))
+	}
+
+	// Update lives
+	if livesElem := doc.Call("getElementById", "lives"); !livesElem.IsUndefined() {
+		livesElem.Set("textContent", fmt.Sprintf("%d", state.Lives))
+	}
+
+	// Update level
+	if levelElem := doc.Call("getElementById", "level"); !levelElem.IsUndefined() {
+		levelElem.Set("textContent", fmt.Sprintf("%d", state.Wave))
+	}
+
+	// Update status message
+	if statusElem := doc.Call("getElementById", "status"); !statusElem.IsUndefined() {
+		var status string
+		switch state.Mode {
+		case game.AttractMode:
+			status = "INSERT COIN TO PLAY"
+		case game.Playing:
+			status = "PLAYING"
+		case game.GameOver:
+			status = "GAME OVER"
+		case game.HighScore:
+			status = "NEW HIGH SCORE!"
+		}
+		statusElem.Set("textContent", status)
+	}
 }
 
 // initializeGame sets up the game and starts it

@@ -48,6 +48,54 @@ func (e *Engine) StartNewGame() {
 	e.resetInvaderMovement()
 }
 
+// ProcessAnalogInput processes analog input for camera control
+func (e *Engine) ProcessAnalogInput(analogX float64, firePressed, fireJustPressed, pauseJustPressed bool) {
+	// Handle mode-specific input
+	switch e.state.Mode {
+	case AttractMode:
+		if fireJustPressed || pauseJustPressed {
+			e.StartNewGame()
+		}
+	case Playing:
+		if pauseJustPressed {
+			e.state.TogglePause()
+		}
+		if !e.state.Paused && e.state.Player != nil && e.state.Player.Alive {
+			// Direct position control based on analog input
+			// Map analogX (-1 to 1) to screen position
+			centerX := float64(e.state.ScreenWidth) / 2
+			maxOffset := float64(e.state.ScreenWidth) / 2 - 30 // Keep ship on screen
+
+			// Set player position directly based on head position
+			targetX := centerX + (analogX * maxOffset)
+
+			// Smooth the movement slightly
+			currentX := e.state.Player.Position.X
+			e.state.Player.Position.X = currentX*0.3 + targetX*0.7
+
+			// Keep within bounds
+			if e.state.Player.Position.X < 30 {
+				e.state.Player.Position.X = 30
+			}
+			if e.state.Player.Position.X > float64(e.state.ScreenWidth)-30 {
+				e.state.Player.Position.X = float64(e.state.ScreenWidth) - 30
+			}
+
+			// Handle shooting
+			if firePressed {
+				bullet := e.state.Player.TryShoot()
+				if bullet != nil {
+					e.state.Bullets = append(e.state.Bullets, bullet)
+				}
+			}
+		}
+	case GameOver, HighScore:
+		if fireJustPressed || pauseJustPressed {
+			e.state.Mode = AttractMode
+		}
+	}
+}
+
 // ProcessInput processes input events and updates input state
 func (e *Engine) ProcessInput(leftPressed, rightPressed, firePressed, fireJustPressed, pauseJustPressed bool) {
 	input := e.state.InputState

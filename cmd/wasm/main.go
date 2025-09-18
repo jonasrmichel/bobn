@@ -145,25 +145,29 @@ func (g *Game) update(deltaTime float64) {
 		// Get input state from bridge
 		input := g.bridge.GetInputState()
 
-		// Merge camera input with keyboard input
-		leftPressed := input.LeftPressed || (g.camera.IsEnabled() && g.cameraX < -0.2)
-		rightPressed := input.RightPressed || (g.camera.IsEnabled() && g.cameraX > 0.2)
+		// If camera is enabled, use analog control
+		if g.camera.IsEnabled() && g.engine.GetState().Mode == game.Playing {
+			// Use camera position for analog control
+			g.engine.ProcessAnalogInput(
+				g.cameraX,  // Analog X position (-1 to 1)
+				input.FirePressed || math.Abs(g.cameraY) < 0.2,
+				input.FireJustPressed,
+				input.PauseJustPressed || input.EnterJustPressed,
+			)
+		} else {
+			// Use digital keyboard input
+			leftPressed := input.LeftPressed
+			rightPressed := input.RightPressed
 
-		// Auto-fire when camera is enabled and player is moving
-		firePressed := input.FirePressed
-		if g.camera.IsEnabled() && math.Abs(g.cameraY) < 0.2 {
-			// Fire when head is centered vertically
-			firePressed = true
+			// Process input and update game state
+			g.engine.ProcessInput(
+				leftPressed,
+				rightPressed,
+				input.FirePressed,
+				input.FireJustPressed,
+				input.PauseJustPressed || input.EnterJustPressed,
+			)
 		}
-
-		// Process input and update game state
-		g.engine.ProcessInput(
-			leftPressed,
-			rightPressed,
-			firePressed,
-			input.FireJustPressed,
-			input.PauseJustPressed || input.EnterJustPressed,
-		)
 		g.engine.Update(fixedTimeStep / 1000.0) // Convert to seconds
 
 		g.accumulator -= fixedTimeStep
